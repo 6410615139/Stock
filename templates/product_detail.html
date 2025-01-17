@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Product Detail{% endblock %}
+
+{% block content %}
+<h1>Product Detail</h1>
+<p><strong>Timestamp:</strong> {{ product.tstamp|date:"Y-m-d H:i" }}</p>
+<p><strong>Serial Number:</strong> {{ product.serial_number }}</p>
+<p><strong>Name:</strong> {{ product.name }}</p>
+<p><strong>Model:</strong> {{ product.model }}</p>
+<p><strong>Claim Active:</strong> {{ product.is_claim_active|yesno:"Yes,No" }}</p>
+<img src="{{ product.image.url }}" alt="{{ product.name }}" width="200">
+<br><br>
+<a href="{% url 'home' %}"><button>Back to Product List</button></a>
+{% endblock %}

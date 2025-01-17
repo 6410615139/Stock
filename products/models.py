@@ -7,6 +7,7 @@ class Product(models.Model):
     serial_number = models.CharField(max_length=100, unique=True)
     purchase_date = models.DateField()
     warranty_period = models.PositiveIntegerField()  # in months
+    tstamp = models.DateTimeField(auto_now_add=True)
 
     def is_claim_active(self):
         from datetime import date, timedelta

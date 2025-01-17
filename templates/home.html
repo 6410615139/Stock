@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Home{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/table.css' %}">
+<link rel="stylesheet" href="{% static 'css/search-bar.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1>Product List</h1>
+<div class="search-bar">
+    <form method="get" action="">
+        <input type="text" name="q" placeholder="Search for a product..." value="{{ query|default:'' }}">
+        <button type="submit">Search</button>
+    </form>
+</div>
+<!-- Column Selection -->
+<form method="get" action="">
+    <label>
+        <input type="checkbox" name="columns" value="timestamp" {% if "timestamp" in selected_columns %}checked{% endif %}>
+        Timestamp
+    </label>
+    <label>
+        <input type="checkbox" name="columns" value="serial_number" {% if "serial_number" in selected_columns %}checked{% endif %}>
+        Serial Number
+    </label>
+    <label>
+        <input type="checkbox" name="columns" value="image" {% if "image" in selected_columns %}checked{% endif %}>
+        Image
+    </label>
+    <label>
+        <input type="checkbox" name="columns" value="name" {% if "name" in selected_columns %}checked{% endif %}>
+        Name
+    </label>
+    <label>
+        <input type="checkbox" name="columns" value="model" {% if "model" in selected_columns %}checked{% endif %}>
+        Model
+    </label>
+    <label>
+        <input type="checkbox" name="columns" value="claim_active" {% if "claim_active" in selected_columns %}checked{% endif %}>
+        Claim Active
+    </label>
+    <button type="submit">Update Table</button>
+</form>
+<!-- Product Table -->
+<table class="table">
+    <thead>
+        <tr>
+            {% if "timestamp" in selected_columns %}<th>Timestamp</th>{% endif %}
+            {% if "serial_number" in selected_columns %}<th>Serial Number</th>{% endif %}
+            {% if "image" in selected_columns %}<th>Image</th>{% endif %}
+            {% if "name" in selected_columns %}<th>Name</th>{% endif %}
+            {% if "model" in selected_columns %}<th>Model</th>{% endif %}
+            {% if "claim_active" in selected_columns %}<th>Claim Active</th>{% endif %}
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in products %}
+        <tr>
+            {% if "timestamp" in selected_columns %}<td>{{ product.tstamp|date:"Y-m-d H:i" }}</td>{% endif %}
+            {% if "serial_number" in selected_columns %}<td>{{ product.serial_number }}</td>{% endif %}
+            {% if "image" in selected_columns %}<td><img src="{{ product.image.url }}" alt="{{ product.name }}" width="100"></td>{% endif %}
+            {% if "name" in selected_columns %}<td>{{ product.name }}</td>{% endif %}
+            {% if "model" in selected_columns %}<td>{{ product.model }}</td>{% endif %}
+            {% if "claim_active" in selected_columns %}<td>{{ product.is_claim_active|yesno:"Yes,No" }}</td>{% endif %}
+            <td>
+                <a href="{% url 'product_detail' product.pk %}">
+                    <button>Details</button>
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="{{ selected_columns|length|add:1 }}" style="text-align: center; font-weight: bold;">No products found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'export_to_excel' %}">Export to Excel</a>
+{% endblock %}
