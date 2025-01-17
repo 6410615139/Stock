@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <h2>Login</h2>
+    {% if form.errors %}
+        <div class="error-message">
+            <p><strong>Error:</strong> Please correct the errors below.</p>
+        </div>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <label for="id_username">Username:</label>
+        {{ form.username }}
+
+        <label for="id_password">Password:</label>
+        {{ form.password }}
+
+        <button type="submit">Login</button>
+    </form>
+    <p class="signup-link">
+        <a href="{% url 'admin:login' %}">Admin Login</a>
+    </p>
+</div>
+{% endblock %}

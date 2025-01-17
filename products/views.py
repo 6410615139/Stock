@@ -4,9 +4,6 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 import pandas as pd
 from django.http import HttpResponse
 
-def staff_check(user):
-    return user.groups.filter(name='Staff').exists()
-
 def admin_check(user):
     return user.is_superuser
 
@@ -17,7 +14,7 @@ def product_list(request):
 
 from .forms import ProductForm
 
-@user_passes_test(staff_check)
+@login_required
 def add_product(request):
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)

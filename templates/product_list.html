@@ -23,7 +23,5 @@
     {% endfor %}
 </table>
 <a href="{% url 'export_to_excel' %}">Export to Excel</a>
-{% if user.groups.filter(name='Staff').exists %}
     <a href="{% url 'add_product' %}">Add Product</a>
-{% endif %}
 {% endblock %}
