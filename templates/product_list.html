@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Product List{% endblock %}
+
+{% block content %}
+<h1>Product List</h1>
+<table border="1">
+    <tr>
+        <th>Image</th>
+        <th>Name</th>
+        <th>Model</th>
+        <th>Serial Number</th>
+        <th>Claim Active</th>
+    </tr>
+    {% for product in products %}
+    <tr>
+        <td><img src="{{ product.image.url }}" alt="{{ product.name }}" width="100"></td>
+        <td>{{ product.name }}</td>
+        <td>{{ product.model }}</td>
+        <td>{{ product.serial_number }}</td>
+        <td>{{ product.is_claim_active|yesno:"Yes,No" }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<a href="{% url 'export_to_excel' %}">Export to Excel</a>
+{% if user.groups.filter(name='Staff').exists %}
+    <a href="{% url 'add_product' %}">Add Product</a>
+{% endif %}
+{% endblock %}
