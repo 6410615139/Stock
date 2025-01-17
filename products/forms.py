@@ -1,5 +1,5 @@
 from django import forms
-from .models import Product
+from .models import Product, ProductHistory
 
 class ProductForm(forms.ModelForm):
     class Meta:
@@ -11,3 +11,8 @@ class ProductForm(forms.ModelForm):
 
 class UploadExcelForm(forms.Form):
     excel_file = forms.FileField(label="Upload Excel File")
+
+class ProductHistoryForm(forms.ModelForm):
+    class Meta:
+        model = ProductHistory
+        fields = ['product', 'details', 'claim_active']

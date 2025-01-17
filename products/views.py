@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
-from .models import Product
 from django.contrib.auth.decorators import login_required, user_passes_test
-import pandas as pd
 from django.http import HttpResponse
+
+import pandas as pd
+from .forms import ProductForm, UploadExcelForm, ProductHistoryForm
+from .models import Product, ProductHistory
 
 def admin_check(user):
     return user.is_superuser
@@ -31,14 +33,6 @@ def home(request):
         'selected_columns': selected_columns
         }
     return render(request, 'home.html', viewModel)
-
-from .forms import ProductForm
-
-import pandas as pd
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from .forms import ProductForm, UploadExcelForm
-from .models import Product
 
 @login_required
 def add_product(request):
@@ -108,5 +102,28 @@ def export_to_excel(request):
     return response
 
 def product_detail(request, pk):
-    product = get_object_or_404(Product, pk=pk)  # Fetch the product by its ID
-    return render(request, 'product_detail.html', {'product': product})
+    product = get_object_or_404(Product, pk=pk)
+    product_histories = ProductHistory.objects.filter(product=product).order_by('-timestamp')
+    warranty_days_left = product.warranty_days_left()
+
+    return render(request, 'product_detail.html', {
+        'product': product,
+        'warranty_days_left': warranty_days_left,
+        'product_histories': product_histories,
+    })
+
+@login_required
+def product_report(request, pk):
+    product = get_object_or_404(Product, pk=pk)
+
+    if request.method == 'POST':
+        form = ProductHistoryForm(request.POST)
+        if form.is_valid():
+            report = form.save(commit=False)
+            report.product = product  # Associate the report with the product
+            report.save()
+            return redirect('product_detail', pk=product.pk)  # Redirect to the product detail page
+    else:
+        form = ProductHistoryForm(initial={'product': product})  # Pre-fill the product
+
+    return render(request, 'product_report.html', {'form': form, 'product': product})

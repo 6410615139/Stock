@@ -1,13 +1,14 @@
 from django.contrib import admin
-from .models import Product
+from .models import Product, ProductHistory
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'model', 'serial_number', 'purchase_date', 'warranty_period', 'is_claim_active', 'tstamp')
-    list_filter = ('purchase_date', 'warranty_period', 'tstamp')
+    list_display = ('name', 'model', 'serial_number', 'purchase_date', 'is_claim_active', 'tstamp')
     search_fields = ('name', 'model', 'serial_number')
     readonly_fields = ('tstamp',)
 
-    def is_claim_active(self, obj):
-        return obj.is_claim_active()
-    is_claim_active.boolean = True  # Display as a boolean in the admin
+@admin.register(ProductHistory)
+class ProductHistoryAdmin(admin.ModelAdmin):
+    list_display = ('product', 'timestamp', 'details', 'claim_active')
+    list_filter = ('timestamp', 'claim_active')
+    search_fields = ('product__name', 'details')
