@@ -45,13 +45,17 @@ def add_product(request):
 
                 # Convert DataFrame to Products
                 for _, row in df.iterrows():
+                    warranty_period = row.get('Warranty Period (months)', 0)
+                    if not (0 <= warranty_period <= 120):  # Validate warranty period
+                        raise ValueError(f"Invalid warranty period: {warranty_period}")
+                    
                     Product.objects.create(
                         name=row['Name'],
                         model=row['Model'],
                         serial_number=row['Serial Number'],
-                        purchase_date=pd.to_datetime(row['Purchase Date']).date(),  # Ensure DateField
-                        warranty_period=int(row['Warranty Period (months)']),
-                        image=row.get('Image', None),  # Optional image
+                        purchase_date=pd.to_datetime(row['Purchase Date']).date(),
+                        warranty_period=int(warranty_period),
+                        image=row.get('Image', None),
                     )
                 return redirect('home')
         else:
@@ -108,6 +112,7 @@ def product_detail(request, pk):
 
     return render(request, 'product_detail.html', {
         'product': product,
+        'warranty_display': product.get_warranty_display(),
         'warranty_days_left': warranty_days_left,
         'product_histories': product_histories,
     })
