@@ -12,35 +12,44 @@
 <h1>Product List</h1>
 <div class="search-bar">
     <form method="get" action="">
-        <input type="text" name="q" placeholder="Search for a product..." value="{{ query|default:'' }}">
+        <input type="text" name="q" placeholder="Search for a product..." value="{{ query|default:default }}">
         <button type="submit">Search</button>
     </form>
 </div>
+
 <!-- Column Selection -->
 <form method="get" action="">
     <label>
-        <input type="checkbox" name="columns" value="timestamp" {% if "timestamp" in selected_columns %}checked{% endif %}>
-        Timestamp
-    </label>
-    <label>
-        <input type="checkbox" name="columns" value="serial_number" {% if "serial_number" in selected_columns %}checked{% endif %}>
-        Serial Number
-    </label>
-    <label>
-        <input type="checkbox" name="columns" value="image" {% if "image" in selected_columns %}checked{% endif %}>
-        Image
-    </label>
-    <label>
-        <input type="checkbox" name="columns" value="name" {% if "name" in selected_columns %}checked{% endif %}>
-        Name
+        <input type="checkbox" name="columns" value="brand" {% if "brand" in selected_columns %}checked{% endif %}>
+        Brand
     </label>
     <label>
         <input type="checkbox" name="columns" value="model" {% if "model" in selected_columns %}checked{% endif %}>
         Model
     </label>
     <label>
-        <input type="checkbox" name="columns" value="claim_active" {% if "claim_active" in selected_columns %}checked{% endif %}>
-        Claim Active
+        <input type="checkbox" name="columns" value="description" {% if "description" in selected_columns %}checked{% endif %}>
+        Description
+    </label>
+    <label>
+        <input type="checkbox" name="columns" value="EAN_code" {% if "EAN_code" in selected_columns %}checked{% endif %}>
+        EAN code
+    </label>
+    <label>
+        <input type="checkbox" name="columns" value="dealer_price" {% if "dealer_price" in selected_columns %}checked{% endif %}>
+        Dealer Price
+    </label>
+    <label>
+        <input type="checkbox" name="columns" value="volumn_price" {% if "volumn_price" in selected_columns %}checked{% endif %}>
+        Volumn Price
+    </label>
+    <label>
+        <input type="checkbox" name="columns" value="MSRP" {% if "MSRP" in selected_columns %}checked{% endif %}>
+        MSRP
+    </label>
+    <label>
+        <input type="checkbox" name="columns" value="total" {% if "total" in selected_columns %}checked{% endif %}>
+        Totol
     </label>
     <button type="submit">Update Table</button>
 </form>
@@ -48,27 +57,31 @@
 <table class="table">
     <thead>
         <tr>
-            {% if "timestamp" in selected_columns %}<th>Timestamp</th>{% endif %}
-            {% if "serial_number" in selected_columns %}<th>Serial Number</th>{% endif %}
-            {% if "image" in selected_columns %}<th>Image</th>{% endif %}
-            {% if "name" in selected_columns %}<th>Name</th>{% endif %}
+            {% if "brand" in selected_columns %}<th>Brand</th>{% endif %}
             {% if "model" in selected_columns %}<th>Model</th>{% endif %}
-            {% if "claim_active" in selected_columns %}<th>Claim Active</th>{% endif %}
-            <th>Details</th>
+            {% if "description" in selected_columns %}<th>Description</th>{% endif %}
+            {% if "EAN_code" in selected_columns %}<th>EAN code</th>{% endif %}
+            {% if "dealer_price" in selected_columns %}<th>Dealer price</th>{% endif %}
+            {% if "volumn_price" in selected_columns %}<th>Volumn price</th>{% endif %}
+            {% if "MSRP" in selected_columns %}<th>MSRP</th>{% endif %}
+            {% if "total" in selected_columns %}<th>Total</th>{% endif %}
+            <th>Branch</th>
         </tr>
     </thead>
     <tbody>
         {% for product in products %}
         <tr>
-            {% if "timestamp" in selected_columns %}<td>{{ product.tstamp|date:"Y-m-d H:i" }}</td>{% endif %}
-            {% if "serial_number" in selected_columns %}<td>{{ product.serial_number }}</td>{% endif %}
-            {% if "image" in selected_columns %}<td><img src="{{ product.image.url }}" alt="{{ product.name }}" width="100"></td>{% endif %}
-            {% if "name" in selected_columns %}<td>{{ product.name }}</td>{% endif %}
+            {% if "brand" in selected_columns %}<td>{{ product.brand }}</td>{% endif %}
             {% if "model" in selected_columns %}<td>{{ product.model }}</td>{% endif %}
-            {% if "claim_active" in selected_columns %}<td>{{ product.is_claim_active|yesno:"Yes,No" }}</td>{% endif %}
+            {% if "description" in selected_columns %}<td>{{ product.description }}</td>{% endif %}
+            {% if "EAN_code" in selected_columns %}<td>{{ product.EAN_code }}</td>{% endif %}
+            {% if "dealer_price" in selected_columns %}<td>{{ product.dealer_price }}</td>{% endif %}
+            {% if "volumn_price" in selected_columns %}<td>{{ product.volumn_price }}</td>{% endif %}
+            {% if "MSRP" in selected_columns %}<td>{{ product.MSRP }}</td>{% endif %}
+            {% if "total" in selected_columns %}<td>total???</td>{% endif %}
             <td>
-                <a href="{% url 'product_detail' product.pk %}">
-                    <button>Details</button>
+                <a href="{% url 'branch' %}?default={{ product.model }}">
+                    <button>Branch</button>
                 </a>
             </td>
         </tr>

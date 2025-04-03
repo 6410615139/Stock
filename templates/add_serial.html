@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Add Serial{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/form.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1>Add Product</h1>
+
+<!-- Single Product Form -->
+<h2>Add a Single Serial</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.media }}
+    {{ form.as_p }}
+    <button type="submit">Add Product</button>
+</form>
+
+<hr>
+
+<!-- Excel Upload Form -->
+<h2>Upload Excel File</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ excel_form.as_p }}
+    <button type="submit">Upload Excel</button>
+</form>
+{% endblock %}

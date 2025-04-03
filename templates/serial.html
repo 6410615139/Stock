@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Serial{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/table.css' %}">
+<link rel="stylesheet" href="{% static 'css/search-bar.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1>Serial List</h1>
+
+<!-- Product Table -->
+<table class="table">
+    <thead>
+        <tr>
+            <th>Serial</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in serials %}
+        <tr>
+            <td>{{ product.serial }}</td>
+            <td>
+                <a href="{% url 'home' %}?default={{ product.product.model }}">
+                    <button>Details</button>
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="{{ selected_columns|length|add:1 }}" style="text-align: center; font-weight: bold;">No products found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'export_to_excel' %}">Export to Excel</a>
+{% endblock %}
