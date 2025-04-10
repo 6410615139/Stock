@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponse
 
 import pandas as pd
-from .forms import ProductForm, UploadExcelForm, SerialForm, TransactionForm
+from .forms import ProductForm, UploadExcelForm, SerialForm, TransactionForm, MultipleSerialForm
 from .models import Product, Serial, BranchProduct, Branch
 from django.db.models import Sum
 
@@ -196,45 +196,66 @@ def serial(request):
 @login_required
 def add_serial(request):
     if request.method == 'POST':
-        if 'excel_file' in request.FILES:
+        submit_type = request.POST.get('submit_type')
+
+        # Excel upload
+        if submit_type == 'excel' and 'excel_file' in request.FILES:
             excel_form = UploadExcelForm(request.POST, request.FILES)
             if excel_form.is_valid():
                 excel_file = request.FILES['excel_file']
                 df = pd.read_excel(excel_file)
 
-                # Convert DataFrame to Serials
                 for _, row in df.iterrows():
                     serial_number = row.get('Serial Number')
                     model_name = row.get('Model')
 
-                    # You must fetch the related Product
                     try:
                         product = Product.objects.get(model=model_name)
+                        Serial.objects.create(
+                            serial=serial_number,
+                            product=product
+                        )
                     except Product.DoesNotExist:
-                        continue  # or handle as you wish
-                    
-                    Serial.objects.create(
-                        serial=serial_number,
-                        product=product
-                    )
+                        continue
 
                 return redirect('serial')
 
-        else:
-            form = SerialForm(request.POST, request.FILES)
+        # Multiple serials (textarea input)
+        elif submit_type == 'multiple':
+            multiple_serial_form = MultipleSerialForm(request.POST)
+            if multiple_serial_form.is_valid():
+                serials_input = multiple_serial_form.cleaned_data['serials']
+                model_name = multiple_serial_form.cleaned_data['model']
+
+                try:
+                    product = Product.objects.get(model=model_name)
+                    print(f"✅ Found product: {product}")
+                    serials = serials_input.replace('\r', '').split('\n')
+                    for s in serials:
+                        for serial in s.split():  # split by space
+                            Serial.objects.create(serial=serial.strip(), product=product)
+                except Product.DoesNotExist:
+                    print(f"❌ Product model '{model_name}' not found")
+
+                return redirect('serial')
+
+        # Single serial
+        elif submit_type == 'single':
+            form = SerialForm(request.POST)
             if form.is_valid():
                 form.save()
                 return redirect('serial')
+
     else:
         form = SerialForm()
         excel_form = UploadExcelForm()
+        multiple_serial_form = MultipleSerialForm()
 
-    viewModel = {
-        'form': form, 
-        'excel_form': excel_form
-    }
-
-    return render(request, 'add_serial.html', viewModel)
+    return render(request, 'add_serial.html', {
+        'single_serial_form': form,
+        'excel_form': excel_form,
+        'multiple_serial_form': multiple_serial_form,
+    })
 
 @login_required
 def add_transaction(request):

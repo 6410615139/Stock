@@ -10,7 +10,7 @@ class Product(models.Model):
     MSRP = models.FloatField()
 
     def __str__(self):
-        return f"{self.brand} | {self.model}"
+        return f"{self.model}"
 
 
 class Serial(models.Model):

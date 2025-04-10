@@ -23,3 +23,10 @@ class SerialForm(forms.ModelForm):
 
 class UploadExcelForm(forms.Form):
     excel_file = forms.FileField(label="Upload Excel File")
+
+class MultipleSerialForm(forms.Form):
+    model = forms.ModelChoiceField(queryset=Product.objects.all(), label="Product Model")
+    serials = forms.CharField(
+        label="Serials (space or enter separated)",
+        widget=forms.Textarea(attrs={"rows": 5, "placeholder": "e.g. SN123 SN124\nSN125"}),
+    )

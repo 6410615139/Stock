@@ -8,24 +8,33 @@
 {% endblock %}
 
 {% block content %}
-<h1>Add Product</h1>
+<h1>Add Product Serial</h1>
 
-<!-- Single Product Form -->
-<h2>Add a Single Serial</h2>
+<!-- Single Serial Form -->
+<h2>1. Add a Single Serial</h2>
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form.media }}
-    {{ form.as_p }}
-    <button type="submit">Add Product</button>
+    {{ single_serial_form.as_p }}
+    <button type="submit" name="submit_type" value="single">Add Serial</button>
+</form>
+
+<hr>
+
+<!-- Multiple Serials Form -->
+<h2>2. Add Multiple Serials (separated by space or enter)</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ multiple_serial_form.as_p }}
+    <button type="submit" name="submit_type" value="multiple">Add Serials</button>
 </form>
 
 <hr>
 
 <!-- Excel Upload Form -->
-<h2>Upload Excel File</h2>
+<h2>3. Upload Serials via Excel File</h2>
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ excel_form.as_p }}
-    <button type="submit">Upload Excel</button>
+    <button type="submit" name="submit_type" value="excel">Upload Excel</button>
 </form>
 {% endblock %}
