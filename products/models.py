@@ -33,6 +33,7 @@ class Transaction(models.Model):
 
 class Branch(models.Model):
     branch = models.CharField(max_length=30)
+    # details = models.CharField(max_length=300, null=True, blank=True)
 
     def __str__(self):
         return self.branch

@@ -5,7 +5,7 @@ from django.http import HttpResponse
 
 import pandas as pd
 from .forms import ProductForm, UploadExcelForm, SerialForm, TransactionForm
-from .models import Product, Serial, BranchProduct
+from .models import Product, Serial, BranchProduct, Branch
 from django.db.models import Sum
 
 from dal_select2.views import Select2QuerySetView
@@ -52,6 +52,13 @@ def home(request):
         'selected_columns': selected_columns
         }
     return render(request, 'home.html', viewModel)
+
+def product_details(request, id):
+    product = Product.objects.get(id=id)
+    viewModel = {
+        'product': product,
+    }
+    return render(request, 'product_details.html', viewModel)
 
 @user_passes_test(admin_check)
 def add_product(request):
@@ -125,29 +132,49 @@ def export_to_excel(request):
     return response
 
 @login_required
-def branch(request):
-    default = request.GET.get('default')
-    if default is None:
-        default=""
-    model_name = request.GET.get('q')
-
-    if model_name is None:
-        model_name = ""
-    
-    branches = (BranchProduct.objects
-            .filter(product__model__icontains=model_name)
-            .values('branch__branch')
-            .annotate(total_quantity=Sum('quantity'))
-            .order_by('branch__branch'))
-
-    print(branches)
-
+def branches(request):
+    branches = Branch.objects.all()
     viewModel = {
-        'default': default,
         'branches': branches,
     }
+    return render(request, 'branches.html', viewModel)
 
-    return render(request, 'productBranch.html', viewModel)
+@login_required
+def branch_details(request, id):
+    branch = get_object_or_404(Branch, id=id)
+    products = BranchProduct.objects.filter(branch=branch)
+
+    viewModel = {
+        'branch': branch,
+        'products': products,
+    }
+
+    return render(request, 'branch_details.html', viewModel)
+
+# @login_required
+# def branch(request):
+#     default = request.GET.get('default')
+#     if default is None:
+#         default=""
+#     model_name = request.GET.get('q')
+
+#     if model_name is None:
+#         model_name = ""
+    
+#     branches = (BranchProduct.objects
+#             .filter(product__model__icontains=model_name)
+#             .values('branch__branch')
+#             .annotate(total_quantity=Sum('quantity'))
+#             .order_by('branch__branch'))
+
+#     print(branches)
+
+#     viewModel = {
+#         'default': default,
+#         'branches': branches,
+#     }
+
+#     return render(request, 'productBranch.html', viewModel)
 
 @login_required
 def serial(request):

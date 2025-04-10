@@ -65,7 +65,7 @@
             {% if "volumn_price" in selected_columns %}<th>Volumn price</th>{% endif %}
             {% if "MSRP" in selected_columns %}<th>MSRP</th>{% endif %}
             {% if "total" in selected_columns %}<th>Total</th>{% endif %}
-            <th>Branch</th>
+            <th>Details</th>
         </tr>
     </thead>
     <tbody>
@@ -80,8 +80,8 @@
             {% if "MSRP" in selected_columns %}<td>{{ product.MSRP }}</td>{% endif %}
             {% if "total" in selected_columns %}<td>total???</td>{% endif %}
             <td>
-                <a href="{% url 'branch' %}?default={{ product.model }}">
-                    <button>Branch</button>
+                <a href="{% url 'product_details' product.id %}">
+                    <button>details</button>
                 </a>
             </td>
         </tr>

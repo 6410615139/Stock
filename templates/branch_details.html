@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Branch Details{% endblock %}
+
+{% block content %}
+<h2>Branch Details</h2>
+
+<div class="card">
+    <p><strong>Branch Name:</strong> {{ branch.branch }}</p>
+    <p><strong>Details:</strong> {{ branch.details }}</p>
+</div>
+
+<h3>Products in this Branch</h3>
+<ul>
+    {% for item in products %}
+        <li>
+            <strong>{{ item.product.brand }} | {{ item.product.model }}</strong><br>
+            Description: {{ item.product.description }}<br>
+            Quantity: {{ item.quantity }}
+        </li>
+    {% empty %}
+        <li>No products available in this branch.</li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'branches' %}">← Back to Branch List</a>
+{% endblock %}
