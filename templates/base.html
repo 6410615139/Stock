@@ -1,13 +1,24 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <title>{% block title %}My Project{% endblock %}</title>
-    <link rel="stylesheet" href="{% static 'css/nav-bar.css' %}">
-    {% block style %}
-    <link rel="stylesheet" href="{% static 'css/page.css' %}">
-    {% endblock %}
-</head>
+    <head>
+        {% load static %}
+        <{% load static %}
+        <meta charset="UTF-8">
+        <title>{% block title %}Stock{% endblock %}</title>
+        <link rel="stylesheet" href="{% static 'css/nav-bar.css' %}">
+        <link rel="stylesheet" href="{% static 'admin/css/vendor/select2/select2.css' %}">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="{% static 'admin/js/vendor/select2/select2.full.js' %}"></script>
+        {% block style %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                $('#id_source').select2();  // Optional fallback if needed
+                $('#id_destination').select2();
+            });
+        </script>
+        <link rel="stylesheet" href="{% static 'css/page.css' %}">
+        {% endblock %}
+    </head>
 <body>
     <header class="nav-bar">
         <div>

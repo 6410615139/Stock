@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Product(models.Model):
     brand = models.CharField(max_length=20)
@@ -10,7 +11,7 @@ class Product(models.Model):
     MSRP = models.FloatField()
 
     def __str__(self):
-        return f"{self.model}"
+        return self.model
 
 
 class Serial(models.Model):
@@ -20,24 +21,29 @@ class Serial(models.Model):
     def __str__(self):
         return f"{self.serial} - {self.product.model}"
 
-
-class Transaction(models.Model):
-    model = models.CharField(max_length=30)
-    quantity = models.IntegerField()
-    source = models.CharField(max_length=30)
-    destination = models.CharField(max_length=30)
-
-    def __str__(self):
-        return f"Transaction of {self.quantity} {self.model} from {self.source} to {self.destination}"
-
-
 class Branch(models.Model):
     branch = models.CharField(max_length=30)
     # details = models.CharField(max_length=300, null=True, blank=True)
 
     def __str__(self):
         return self.branch
+    
+class SerialImportTransaction(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    imported_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    model = models.CharField(max_length=30)
+    quantity = models.IntegerField()    
 
+class Transaction(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    imported_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    model = models.CharField(max_length=30)
+    quantity = models.IntegerField()
+    source = models.ForeignKey(Branch, on_delete=models.CASCADE, null=False, blank=False, related_name='source')
+    destination = models.ForeignKey(Branch, on_delete=models.CASCADE, null=False, blank=False, related_name='destination')
+
+    def __str__(self):
+        return f"Transaction of {self.quantity} {self.model} from {self.source} to {self.destination}"
 
 class BranchProduct(models.Model):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name='products')

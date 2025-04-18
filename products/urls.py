@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import ProductAutocomplete
+from .views import ProductAutocomplete, BranchAutocomplete  
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -13,5 +13,6 @@ urlpatterns = [
     path('branch_details/<int:id>', views.branch_details, name='branch_details'),
     path('serial/', views.serial, name='serial'),
     path('product-autocomplete/', ProductAutocomplete.as_view(), name='product-autocomplete'),
+    path('branch-autocomplete/', BranchAutocomplete.as_view(), name='branch-autocomplete'),
 
 ]

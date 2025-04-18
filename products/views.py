@@ -5,23 +5,32 @@ from django.http import HttpResponse
 
 import pandas as pd
 from .forms import ProductForm, UploadExcelForm, SerialForm, TransactionForm, MultipleSerialForm
-from .models import Product, Serial, BranchProduct, Branch
+from .models import (
+    Product, Serial, SerialImportTransaction, Branch,
+    BranchProduct, Transaction
+)
 from django.db.models import Sum
 
-from dal_select2.views import Select2QuerySetView
+from dal import autocomplete
 
-class ProductAutocomplete(Select2QuerySetView):
+class BranchAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        qs = Product.objects.all()
+        if not self.request.user.is_authenticated:
+            return Branch.objects.none()
+        qs = Branch.objects.all()
         if self.q:
-            qs = qs.filter(
-                Q(model__icontains=self.q) |
-                Q(brand__icontains=self.q) |
-                Q(EAN_code__icontains=self.q)
-            )
+            qs = qs.filter(branch__icontains=self.q)
         return qs
 
-
+class ProductAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return Product.objects.none()
+        qs = Product.objects.all()
+        if self.q:
+            qs = qs.filter(model__icontains=self.q)
+        return qs
+    
 def admin_check(user):
     return user.is_superuser
 
@@ -211,12 +220,14 @@ def add_serial(request):
     if request.method == 'POST':
         submit_type = request.POST.get('submit_type')
 
-        # Excel upload
+        # ✅ Excel Upload
         if submit_type == 'excel' and 'excel_file' in request.FILES:
             excel_form = UploadExcelForm(request.POST, request.FILES)
             if excel_form.is_valid():
                 excel_file = request.FILES['excel_file']
                 df = pd.read_excel(excel_file)
+
+                model_counter = {}
 
                 for _, row in df.iterrows():
                     serial_number = row.get('Serial Number')
@@ -224,39 +235,44 @@ def add_serial(request):
 
                     try:
                         product = Product.objects.get(model=model_name)
-                        Serial.objects.create(
-                            serial=serial_number,
-                            product=product
-                        )
+                        Serial.objects.create(serial=serial_number, product=product)
+                        model_counter[model_name] = model_counter.get(model_name, 0) + 1
                     except Product.DoesNotExist:
                         continue
 
+                _process_import_transaction(model_counter, request.user)
                 return redirect('serial')
 
-        # Multiple serials (textarea input)
+        # ✅ Multiple serials via textarea
         elif submit_type == 'multiple':
             multiple_serial_form = MultipleSerialForm(request.POST)
             if multiple_serial_form.is_valid():
                 serials_input = multiple_serial_form.cleaned_data['serials']
                 model_name = multiple_serial_form.cleaned_data['model']
+                model_counter = {}
 
                 try:
                     product = Product.objects.get(model=model_name)
-                    print(f"✅ Found product: {product}")
                     serials = serials_input.replace('\r', '').split('\n')
+                    count = 0
                     for s in serials:
-                        for serial in s.split():  # split by space
+                        for serial in s.split():
                             Serial.objects.create(serial=serial.strip(), product=product)
+                            count += 1
+                    model_counter[model_name] = count
                 except Product.DoesNotExist:
                     print(f"❌ Product model '{model_name}' not found")
 
+                _process_import_transaction(model_counter, request.user)
                 return redirect('serial')
 
-        # Single serial
+        # ✅ Single serial input
         elif submit_type == 'single':
             form = SerialForm(request.POST)
             if form.is_valid():
-                form.save()
+                serial = form.save()
+                model_name = serial.product.model
+                _process_import_transaction({model_name: 1}, request.user)
                 return redirect('serial')
 
     else:
@@ -270,13 +286,41 @@ def add_serial(request):
         'multiple_serial_form': multiple_serial_form,
     })
 
+# ✅ Helper function to create transaction records and update stock
+def _process_import_transaction(model_counter, user):
+    hq_branch, _ = Branch.objects.get_or_create(branch="HQ")
+
+    for model_name, quantity in model_counter.items():
+        try:
+            product = Product.objects.get(model=model_name)
+
+            # Create SerialImportTransaction
+            SerialImportTransaction.objects.create(
+                imported_by=user,
+                model=model_name,
+                quantity=quantity
+            )
+
+            # Update HQ stock
+            branch_product, _ = BranchProduct.objects.get_or_create(
+                branch=hq_branch,
+                product=product,
+                defaults={'quantity': 0}
+            )
+            branch_product.quantity += quantity
+            branch_product.save()
+
+        except Product.DoesNotExist:
+            continue
+
 @login_required
 def add_transaction(request):
     if request.method == 'POST':
         form = TransactionForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            return redirect('serial')
+            transaction = form.save() 
+            destination_id = transaction.destination.id
+            return redirect('branch_details', branch_id=destination_id)
     else:
         form = TransactionForm()
 

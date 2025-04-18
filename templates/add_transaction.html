@@ -4,15 +4,15 @@
 {% block title %}Create Transaction{% endblock %}
 
 {% block style %}
+{{ form.media }}
 <link rel="stylesheet" href="{% static 'css/form.css' %}">
 {% endblock %}
 
 {% block content %}
 <h1>Create Transaction</h1>
 
-<form method="post" enctype="multipart/form-data">
+<form method="post">
     {% csrf_token %}
-    {{ form.media }}
     {{ form.as_p }}
     <button type="submit">Create transaction</button>
 </form>

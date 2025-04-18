@@ -12,20 +12,28 @@ class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction
         fields = ['model', 'quantity', 'source', 'destination']
+        widgets = {
+            'source': ModelSelect2(url='branch-autocomplete'),
+            'destination': ModelSelect2(url='branch-autocomplete'),
+        }
 
 class SerialForm(forms.ModelForm):
     class Meta:
         model = Serial
         fields = ['serial', 'product']
-        # widgets = {
-        #     'product': ModelSelect2(url='product-autocomplete')
-        # }
+        widgets = {
+            'product': ModelSelect2(url='product-autocomplete')
+        }
 
 class UploadExcelForm(forms.Form):
     excel_file = forms.FileField(label="Upload Excel File")
 
 class MultipleSerialForm(forms.Form):
-    model = forms.ModelChoiceField(queryset=Product.objects.all(), label="Product Model")
+    model = forms.ModelChoiceField(
+        queryset=Product.objects.all(),
+        label="Product Model",
+        widget=ModelSelect2(url='product-autocomplete')
+    )
     serials = forms.CharField(
         label="Serials (space or enter separated)",
         widget=forms.Textarea(attrs={"rows": 5, "placeholder": "e.g. SN123 SN124\nSN125"}),
