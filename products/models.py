@@ -31,16 +31,16 @@ class Branch(models.Model):
 class SerialImportTransaction(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     imported_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    model = models.CharField(max_length=30)
+    model = models.ForeignKey(Product, on_delete=models.PROTECT)
     quantity = models.IntegerField()    
 
 class Transaction(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     imported_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    model = models.CharField(max_length=30)
+    model = models.ForeignKey(Product, on_delete=models.PROTECT)
     quantity = models.IntegerField()
-    source = models.ForeignKey(Branch, on_delete=models.CASCADE, null=False, blank=False, related_name='source')
-    destination = models.ForeignKey(Branch, on_delete=models.CASCADE, null=False, blank=False, related_name='destination')
+    source = models.ForeignKey(Branch, on_delete=models.PROTECT, null=False, blank=False, related_name='source')
+    destination = models.ForeignKey(Branch, on_delete=models.PROTECT, null=False, blank=False, related_name='destination')
 
     def __str__(self):
         return f"Transaction of {self.quantity} {self.model} from {self.source} to {self.destination}"

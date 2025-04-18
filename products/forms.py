@@ -13,6 +13,7 @@ class TransactionForm(forms.ModelForm):
         model = Transaction
         fields = ['model', 'quantity', 'source', 'destination']
         widgets = {
+            'model': ModelSelect2(url='product-autocomplete'),
             'source': ModelSelect2(url='branch-autocomplete'),
             'destination': ModelSelect2(url='branch-autocomplete'),
         }

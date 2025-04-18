@@ -297,7 +297,7 @@ def _process_import_transaction(model_counter, user):
             # Create SerialImportTransaction
             SerialImportTransaction.objects.create(
                 imported_by=user,
-                model=model_name,
+                model=product,
                 quantity=quantity
             )
 
@@ -318,14 +318,37 @@ def add_transaction(request):
     if request.method == 'POST':
         form = TransactionForm(request.POST, request.FILES)
         if form.is_valid():
-            transaction = form.save() 
-            destination_id = transaction.destination.id
-            return redirect('branch_details', branch_id=destination_id)
+            transaction = form.save(commit=False)
+
+            product_model = transaction.model  # this is a Product instance if you changed to ForeignKey
+            quantity = transaction.quantity
+            source_branch = transaction.source
+            destination_branch = transaction.destination
+
+            # Get source stock
+            source_stock = BranchProduct.objects.filter(branch=source_branch, product=product_model).first()
+            if not source_stock or source_stock.quantity < quantity:
+                form.add_error('quantity', f"Not enough stock in {source_branch}. Available: {source_stock.quantity if source_stock else 0}")
+                return render(request, 'add_transaction.html', {'form': form})
+
+            # ✅ Subtract from source
+            source_stock.quantity -= quantity
+            source_stock.save()
+
+            # ✅ Add to destination (get or create)
+            dest_stock, _ = BranchProduct.objects.get_or_create(
+                branch=destination_branch,
+                product=product_model,
+                defaults={'quantity': 0}
+            )
+            dest_stock.quantity += quantity
+            dest_stock.save()
+
+            transaction.imported_by = request.user
+            transaction.save()
+
+            return redirect('branch_details', id=destination_branch.id)
     else:
         form = TransactionForm()
 
-    viewModel = {
-        'form': form, 
-    }
-
-    return render(request, 'add_transaction.html', viewModel)
+    return render(request, 'add_transaction.html', {'form': form})
