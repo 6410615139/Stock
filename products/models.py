@@ -47,7 +47,7 @@ class Transaction(models.Model):
 
 class BranchProduct(models.Model):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name='products')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    model = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
 
     def __str__(self):
