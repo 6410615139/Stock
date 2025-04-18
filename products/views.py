@@ -178,17 +178,22 @@ def branch_details(request, id):
 
 @login_required
 def serial(request):
+
+    serials = Serial.objects.all()
+    
+    query = request.GET.get('q')  # Get the search query from the request
+    if query:
+        serials = Serial.objects.filter(
+            Q(serial__icontains=query)
+        )
     default = request.GET.get('default')
     if default is None:
         default=""
     model_name = request.GET.get('model')
-    
-    # Get grouped branch data
-    serials = Serial.objects.all()
-
     viewModel = {
         'default': default,
         'serials': serials,
+        'query': query
     }
 
     return render(request, 'serial.html', viewModel)
