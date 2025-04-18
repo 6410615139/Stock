@@ -61,6 +61,11 @@ def home(request):
             Q(EAN_code__icontains=query)
         )
 
+    for product in products:
+        product.total_quantity = sum(
+            item.quantity for item in product.branchproduct_set.all()
+        )
+
     viewModel = {
         'default': default,
         'products': products, 
