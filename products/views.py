@@ -27,30 +27,38 @@ def admin_check(user):
 
 @login_required
 def home(request):
-    default = request.GET.get('default')
-    if default is None:
-        default=""
-    # Get selected columns from the query string
+    products = Product.objects.all()
+
+    # default query
+    default = request.GET.get('default', "")
+    if default != "":
+        products = products.filter(
+            Q(brand__icontains=default) | 
+            Q(model__icontains=default) |
+            Q(EAN_code__icontains=default)
+        )
+
+    # selected column setting
     selected_columns = request.GET.getlist('columns')
     if not selected_columns:
-        selected_columns = ['brand','model', 'description', 'EAN_code', 'dealer_price', 'volumn_price', 'MSRP', "total"]  # Default columns
+        selected_columns = ['brand','model', 'description', 'EAN_code', 'dealer_price', 'volumn_price', 'MSRP', "total"]
 
+    # searchbar query
     query = request.GET.get('q')  # Get the search query from the request
     if query:
-        products = Product.objects.filter(
+        products = products.filter(
             Q(brand__icontains=query) | 
             Q(model__icontains=query) |
             Q(EAN_code__icontains=query)
         )
 
-    else:
-        products = Product.objects.all()  # Show all products if no search query
     viewModel = {
         'default': default,
         'products': products, 
         'query': query, 
         'selected_columns': selected_columns
-        }
+    }
+    
     return render(request, 'home.html', viewModel)
 
 def product_details(request, id):
