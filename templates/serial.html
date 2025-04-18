@@ -31,7 +31,7 @@
         <tr>
             <td>{{ product.serial }}</td>
             <td>
-                <a href="{% url 'home' %}?default={{ product.product.model }}">
+                <a href="{% url 'product_details' product.product.id %} ">
                     <button>Details</button>
                 </a>
             </td>
