@@ -76,12 +76,30 @@ def view_product_list(request):
 @login_required
 def view_product_details(request, id):
     product = get_object_or_404(Product, id=id)
-    transactions = Transaction.objects.filter(model=product).select_related("source", "destination", "imported_by").order_by("-created_at")
+
+    branch_q = request.GET.get("branch_q")
+    txn_q = request.GET.get("txn_q")
+
+    branches = product.branchproduct_set.select_related("branch")
+    if branch_q:
+        branches = branches.filter(branch__branch__icontains=branch_q)
+
+    transactions = Transaction.objects.filter(model=product).select_related("source", "destination", "imported_by")
+    if txn_q:
+        transactions = transactions.filter(
+            Q(source__branch__icontains=txn_q) | 
+            Q(destination__branch__icontains=txn_q) |
+            Q(imported_by__username__icontains=txn_q)
+        )
 
     return render(request, "view_product_details.html", {
         "product": product,
+        "branch_q": branch_q,
+        "txn_q": txn_q,
+        "branches": branches,
         "transactions": transactions,
     })
+
 
 @user_passes_test(admin_check)
 def add_product(request):
