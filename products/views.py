@@ -275,7 +275,7 @@ def add_serial(request):
 
 # ✅ Helper function to create transaction records and update stock
 def _process_import_transaction(model_counter, user):
-    hq_branch, _ = Branch.objects.get_or_create(branch="HQ")
+    hq_branch, _ = Branch.objects.get_or_create(branch="สำนักงานใหญ่")
 
     for model_name, quantity in model_counter.items():
         try:
