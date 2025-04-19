@@ -60,7 +60,7 @@
             {% if "MSRP" in selected_columns %}<td>{{ product.MSRP }}</td>{% endif %}
             {% if "total" in selected_columns %}<td>{{ product.total_quantity }}</td>{% endif %}
             <td>
-                <a href="{% url 'product_details' product.id %}">
+                <a href="{% url 'view_product_details' product.id %}">
                     <button>details</button>
                 </a>
             </td>

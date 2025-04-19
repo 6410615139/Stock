@@ -25,11 +25,11 @@
         </div>
         <div class="nav-links">
             {% if user.is_authenticated %}
-            <a href="{% url 'home' %}">Product List</a>
+            <a href="{% url 'view_product_list' %}">Product List</a>
             <a href="{% url 'add_product' %}">+Product Type</a>
-            <a href="{% url 'serial' %}">Serial</a>
+            <a href="{% url 'view_serial_list' %}">Serial</a>
             <a href="{% url 'add_serial' %}">+Serial</a>
-            <a href="{% url 'branches' %}">Branch</a>
+            <a href="{% url 'view_branch_list' %}">Branch</a>
             <a href="{% url 'add_transaction' %}">+Transaction</a>
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}

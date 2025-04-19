@@ -36,7 +36,7 @@ def admin_check(user):
     return user.is_superuser
 
 @login_required
-def home(request):
+def view_product_list(request):
     products = Product.objects.all()
 
     # default query
@@ -69,14 +69,14 @@ def home(request):
         'selected_columns': selected_columns
     }
     
-    return render(request, 'home.html', viewModel)
+    return render(request, 'view_product_list.html', viewModel)
 
-def product_details(request, id):
+def view_product_details(request, id):
     product = Product.objects.get(id=id)
     viewModel = {
         'product': product,
     }
-    return render(request, 'product_details.html', viewModel)
+    return render(request, 'view_product_details.html', viewModel)
 
 @user_passes_test(admin_check)
 def add_product(request):
@@ -119,15 +119,15 @@ def add_product(request):
     return render(request, 'add_product.html', viewModel)
 
 @login_required
-def branches(request):
+def view_branch_list(request):
     branches = Branch.objects.all()
     viewModel = {
         'branches': branches,
     }
-    return render(request, 'branches.html', viewModel)
+    return render(request, 'view_branch_list.html', viewModel)
 
 @login_required
-def branch_details(request, id):
+def view_branch_details(request, id):
     branch = get_object_or_404(Branch, id=id)
     products = BranchProduct.objects.filter(branch=branch)
 
@@ -136,35 +136,10 @@ def branch_details(request, id):
         'products': products,
     }
 
-    return render(request, 'branch_details.html', viewModel)
-
-# @login_required
-# def branch(request):
-#     default = request.GET.get('default')
-#     if default is None:
-#         default=""
-#     model_name = request.GET.get('q')
-
-#     if model_name is None:
-#         model_name = ""
-    
-#     branches = (BranchProduct.objects
-#             .filter(product__model__icontains=model_name)
-#             .values('branch__branch')
-#             .annotate(total_quantity=Sum('quantity'))
-#             .order_by('branch__branch'))
-
-#     print(branches)
-
-#     viewModel = {
-#         'default': default,
-#         'branches': branches,
-#     }
-
-#     return render(request, 'productBranch.html', viewModel)
+    return render(request, 'view_branch_details.html', viewModel)
 
 @login_required
-def serial(request):
+def view_serial_list(request):
 
     serials = Serial.objects.all()
     
@@ -176,14 +151,14 @@ def serial(request):
     default = request.GET.get('default')
     if default is None:
         default=""
-    model_name = request.GET.get('model')
+
     viewModel = {
         'default': default,
         'serials': serials,
         'query': query
     }
 
-    return render(request, 'serial.html', viewModel)
+    return render(request, 'view_serial_list.html', viewModel)
 
 @login_required
 def add_serial(request):
@@ -325,33 +300,39 @@ def add_transaction(request):
 
 @login_required
 def export_to_excel(request, instance):
-    # Mapping instance name to model queryset
     model_map = {
         "products": Product,
         "branches": Branch,
         "serials": Serial,
+        "branchproducts": BranchProduct,
     }
 
     model = model_map.get(instance)
     if not model:
         raise Http404("Invalid export type")
 
-    # Get all query params for filtering
     filters = request.GET.dict()
-
-    # Build filtered queryset
     queryset = model.objects.filter(**filters)
 
-    # Add .select_related if needed (Serial)
     if instance == "serials":
         queryset = queryset.select_related("product")
+    elif instance == "branchproducts":
+        queryset = queryset.select_related("branch", "model")
 
-    # Call .to_excel_row() for each instance
     data = [obj.to_excel_row() for obj in queryset]
     df = pd.DataFrame(data)
 
-    filename = f"{now().strftime('%Y-%m-%d')}-{instance}.xlsx"
+    # Optional: use model name in filename if available from query
+    suffix = ""
+    if instance == "branchproducts":
+        model_name = request.GET.get("model__model")
+        if model_name:
+            suffix = f"-{model_name}"
+
+    filename = f"{now().strftime('%Y-%m-%d')}-{instance}{suffix}.xlsx"
+
     response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     df.to_excel(response, index=False)
     return response
+

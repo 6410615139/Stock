@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Product Details{% endblock %}
+
+{% block content %}
+<h2>Product Details</h2>
+
+<div class="card">
+    <p><strong>Brand:</strong> {{ product.brand }}</p>
+    <p><strong>Model:</strong> {{ product.model }}</p>
+    <p><strong>Description:</strong> {{ product.description }}</p>
+    <p><strong>EAN Code:</strong> {{ product.EAN_code }}</p>
+    <p><strong>Dealer Price:</strong> {{ product.dealer_price }}</p>
+    <p><strong>Volume Price:</strong> {{ product.volumn_price }}</p>
+    <p><strong>MSRP:</strong> {{ product.MSRP }}</p>
+</div>
+
+<h3>Available at Branches</h3>
+
+{% if product.branchproduct_set.all %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Branch</th>
+            <th>Quantity</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in product.branchproduct_set.all %}
+        <tr>
+            <td>{{ item.branch.branch }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>
+                <a href="{% url 'view_branch_details' item.branch.id %}">
+                    <button>View Branch</button>
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>This product is not stocked at any branches.</p>
+{% endif %}
+
+<a href="{% url 'export_to_excel' 'branchproducts' %}?model__model={{ product.model }}">
+    <button>Export to Excel</button>
+</a>
+
+<br>
+<a href="{% url 'view_product_list' %}">← Back to Product List</a>
+{% endblock %}
