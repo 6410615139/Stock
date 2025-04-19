@@ -11,17 +11,37 @@
 </div>
 
 <h3>Products in this Branch</h3>
-<ul>
-    {% for item in products %}
-        <li>
-            <strong>{{ item.product.brand }} | {{ item.product.model }}</strong><br>
-            Description: {{ item.product.description }}<br>
-            Quantity: {{ item.quantity }}
-        </li>
-    {% empty %}
-        <li>No products available in this branch.</li>
-    {% endfor %}
-</ul>
 
+{% if products %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Brand</th>
+            <th>Model</th>
+            <th>Description</th>
+            <th>Quantity</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in products %}
+        <tr>
+            <td>{{ item.model.brand }}</td>
+            <td>{{ item.model.model }}</td>
+            <td>{{ item.model.description }}</td>
+            <td>{{ item.quantity }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Export to Excel button -->
+<a href="{% url 'export_to_excel' 'branchproducts' %}?branch__branch={{ branch.branch|urlencode }}">
+    <button>Export to Excel</button>
+</a>
+
+{% else %}
+<p>No products available in this branch.</p>
+{% endif %}
+<br>
 <a href="{% url 'view_branch_list' %}">← Back to Branch List</a>
 {% endblock %}

@@ -14,6 +14,8 @@ from django.db.models import Sum
 from django.utils.timezone import now
 from dal import autocomplete
 
+from django.utils.text import slugify
+
 class BranchAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         if not self.request.user.is_authenticated:
@@ -322,12 +324,17 @@ def export_to_excel(request, instance):
     data = [obj.to_excel_row() for obj in queryset]
     df = pd.DataFrame(data)
 
-    # Optional: use model name in filename if available from query
-    suffix = ""
+    # Build filename suffix from both model name and branch name if present
+    suffix_parts = []
     if instance == "branchproducts":
         model_name = request.GET.get("model__model")
+        branch_name = request.GET.get("branch__branch")
         if model_name:
-            suffix = f"-{model_name}"
+            suffix_parts.append(slugify(model_name))
+        if branch_name:
+            suffix_parts.append(slugify(branch_name))
+
+    suffix = "-" + "-".join(suffix_parts) if suffix_parts else ""
 
     filename = f"{now().strftime('%Y-%m-%d')}-{instance}{suffix}.xlsx"
 
@@ -335,4 +342,3 @@ def export_to_excel(request, instance):
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     df.to_excel(response, index=False)
     return response
-
