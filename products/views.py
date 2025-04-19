@@ -221,11 +221,16 @@ def add_serial(request):
                 model_counter = {}
 
                 for _, row in df.iterrows():
-                    serial_number = row.get('Serial')
+                    serial_number = str(row.get('Serial')).strip()
                     model_name = row.get('Product Model')
+
+                    if not serial_number or not model_name:
+                        continue
 
                     try:
                         product = Product.objects.get(model=model_name)
+                        if Serial.objects.filter(serial=serial_number).exists():
+                            continue  # Skip duplicate
                         Serial.objects.create(serial=serial_number, product=product)
                         model_counter[model_name] = model_counter.get(model_name, 0) + 1
                     except Product.DoesNotExist:
@@ -390,10 +395,10 @@ def export_to_excel(request, instance):
 @login_required
 def view_transaction_list(request):
     query = request.GET.get("q")
-    transactions = Transaction.objects.select_related("model", "source", "destination", "imported_by")
+    transactions = Transaction.objects.select_related("product", "source", "destination", "imported_by")
 
     if query:
-        transactions = transactions.filter(model__model__icontains=query)
+        transactions = transactions.filter(product__model__icontains=query)
 
     transactions = transactions.order_by("-created_at")
 
