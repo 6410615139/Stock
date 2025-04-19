@@ -84,7 +84,7 @@ def view_product_details(request, id):
     if branch_q:
         branches = branches.filter(branch__branch__icontains=branch_q)
 
-    transactions = Transaction.objects.filter(model=product).select_related("source", "destination", "imported_by")
+    transactions = Transaction.objects.filter(product=product).select_related("source", "destination", "imported_by")
     if txn_q:
         transactions = transactions.filter(
             Q(source__branch__icontains=txn_q) | 
