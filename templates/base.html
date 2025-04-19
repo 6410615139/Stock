@@ -30,6 +30,7 @@
             <a href="{% url 'view_serial_list' %}">Serial</a>
             <a href="{% url 'add_serial' %}">+Serial</a>
             <a href="{% url 'view_branch_list' %}">Branch</a>
+            <a href="{% url 'view_transaction_list' %}">Transaction</a>
             <a href="{% url 'add_transaction' %}">+Transaction</a>
                 <form method="post" action="{% url 'logout' %}">
                     {% csrf_token %}

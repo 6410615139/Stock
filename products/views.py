@@ -342,3 +342,18 @@ def export_to_excel(request, instance):
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     df.to_excel(response, index=False)
     return response
+
+@login_required
+def view_transaction_list(request):
+    query = request.GET.get("q")
+    transactions = Transaction.objects.select_related("model", "source", "destination", "imported_by")
+
+    if query:
+        transactions = transactions.filter(model__model__icontains=query)
+
+    transactions = transactions.order_by("-created_at")
+
+    return render(request, "view_transaction_list.html", {
+        "transactions": transactions,
+        "query": query,
+    })
