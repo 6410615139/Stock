@@ -50,6 +50,17 @@ def view_product_list(request):
             Q(EAN_code__icontains=default)
         )
 
+    available_columns = [
+        ("brand", "Brand"),
+        ("model", "Model"),
+        ("description", "Description"),
+        ("EAN_code", "EAN code"),
+        ("dealer_price", "Dealer Price"),
+        ("volumn_price", "Volumn Price"),
+        ("MSRP", "MSRP"),
+        ("total", "Total"),
+    ]
+
     # selected column setting
     selected_columns = request.GET.getlist('columns')
     if not selected_columns:
@@ -68,7 +79,8 @@ def view_product_list(request):
         'default': default,
         'products': products, 
         'query': query, 
-        'selected_columns': selected_columns
+        'selected_columns': selected_columns,
+        "available_columns": available_columns
     }
     
     return render(request, 'view_product_list.html', viewModel)

@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Stock{% endblock %}</title>
+    <title>{% block title %}ระบบจัดการสินค้า{% endblock %}</title>
 
     <!-- Admin & site styles -->
     <link rel="stylesheet" href="{% static 'css/nav-bar.css' %}">
@@ -20,34 +20,34 @@
     {% block style %}{% endblock %}
 </head>
 
-<body class="{% block body_class %}{% endblock %}">
+<body class="dashboard">
     <div id="container">
-        <div id="header">
+        <header id="header">
             <div id="branding">
-                <h1 id="site-name"><a href="/">Stock Management System</a></h1>
+                <h1 id="site-name"><a href="/">ระบบจัดการสินค้า</a></h1>
             </div>
 
             {% if user.is_authenticated %}
             <div id="user-tools">
-                <a href="{% url 'view_product_list' %}">Product List</a> / 
-                <a href="{% url 'add_product' %}">+Product Type</a> / 
-                <a href="{% url 'view_serial_list' %}">Serial</a> / 
-                <a href="{% url 'add_serial' %}">+Serial</a> / 
-                <a href="{% url 'view_branch_list' %}">Branch</a> / 
-                <a href="{% url 'view_transaction_list' %}">Transaction</a> / 
-                <a href="{% url 'add_transaction' %}">+Transaction</a> / 
+                <a href="{% url 'view_product_list' %}">ชนิดสินค้า</a> /
+                <a href="{% url 'add_product' %}">เพิ่มชนิดสินค้า</a> /
+                <a href="{% url 'view_serial_list' %}">Serial</a> /
+                <a href="{% url 'add_serial' %}">+Serial</a> /
+                <a href="{% url 'view_branch_list' %}">สาขา</a> /
+                <a href="{% url 'view_transaction_list' %}">ธุรกรรม</a> /
+                <a href="{% url 'add_transaction' %}">ย้ายสินค้า</a> /
                 <form id="logout-form" method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
-                    <button type="submit">Logout</button>
+                    <button type="submit">ออกจากระบบ</button>
                 </form>
             </div>
             {% endif %}
-        </header>
 
+        </header>
+        <div id="content" class="colM">
+            {% block content %}{% endblock %}
+        </div>
     </div>
-    <main id="content-start" class="content">
-        {% block content %}{% endblock %}
-    </main>
 </body>
 
 </html>

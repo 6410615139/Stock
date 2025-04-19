@@ -1,70 +1,106 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Home{% endblock %}
+{% block title %}รายการชนิดสินค้า{% endblock %}
 
 {% block style %}
+<style>
+    .column-selection {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    
+    .column-selection label {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        background: #f8f8f8;
+        border: 1px solid #ccc;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+    </style>
 {% endblock %}
 
 {% block content %}
-<h1>Product List</h1>
+<div id="content-main">
+        <h1>รายการชนิดสินค้า</h1>
 
-<form method="get" action="">
-    <div class="search-bar">
-        <input type="text" name="q" placeholder="Search for a product..." value="{{ query|default:'' }}">
-        <button type="submit">Apply</button>
+        <ul class="object-tools">
+            <li>
+                <a href="{% url 'add_product' %}" class="addlink">เพิ่มชนิดสินค้า</a>
+            </li>
+        </ul>
+
+        <div id="toolbar">
+            <form id="changelist-search" method="get" action="">
+                <div>
+                    <img src="/static/admin/img/search.svg" alt="Search">
+                    <input id="searchbar" type="text" name="q" placeholder="Search for a product..." value="{{ query|default:'' }}">
+                    <input type="submit" value="Search">
+                </div>       
+                <div>
+                    <div class="column-selection">
+                        {% for col, label in available_columns %}
+                            <label>
+                                <input type="checkbox" name="columns" value="{{ col }}" {% if col in selected_columns %}checked{% endif %}>
+                                {{ label }}
+                            </label>
+                        {% endfor %}
+                    </div>
+                </div> 
+            </form>
+        </div>
     </div>
-    <div class="column-selection">
-        <label><input type="checkbox" name="columns" value="brand" {% if "brand" in selected_columns %}checked{% endif %}> Brand</label>
-        <label><input type="checkbox" name="columns" value="model" {% if "model" in selected_columns %}checked{% endif %}> Model</label>
-        <label><input type="checkbox" name="columns" value="description" {% if "description" in selected_columns %}checked{% endif %}> Description</label>
-        <label><input type="checkbox" name="columns" value="EAN_code" {% if "EAN_code" in selected_columns %}checked{% endif %}> EAN code</label>
-        <label><input type="checkbox" name="columns" value="dealer_price" {% if "dealer_price" in selected_columns %}checked{% endif %}> Dealer Price</label>
-        <label><input type="checkbox" name="columns" value="volumn_price" {% if "volumn_price" in selected_columns %}checked{% endif %}> Volumn Price</label>
-        <label><input type="checkbox" name="columns" value="MSRP" {% if "MSRP" in selected_columns %}checked{% endif %}> MSRP</label>
-        <label><input type="checkbox" name="columns" value="total" {% if "total" in selected_columns %}checked{% endif %}> Total</label>
-    </div>        
-</form>
+    
+
 
 <!-- Product Table -->
-<table class="table">
-    <thead>
-        <tr>
-            {% if "brand" in selected_columns %}<th>Brand</th>{% endif %}
-            {% if "model" in selected_columns %}<th>Model</th>{% endif %}
-            {% if "description" in selected_columns %}<th>Description</th>{% endif %}
-            {% if "EAN_code" in selected_columns %}<th>EAN code</th>{% endif %}
-            {% if "dealer_price" in selected_columns %}<th>Dealer price</th>{% endif %}
-            {% if "volumn_price" in selected_columns %}<th>Volumn price</th>{% endif %}
-            {% if "MSRP" in selected_columns %}<th>MSRP</th>{% endif %}
-            {% if "total" in selected_columns %}<th>Total</th>{% endif %}
-            <th>Details</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for product in products %}
-        <tr>
-            {% if "brand" in selected_columns %}<td>{{ product.brand }}</td>{% endif %}
-            {% if "model" in selected_columns %}<td>{{ product.model }}</td>{% endif %}
-            {% if "description" in selected_columns %}<td>{{ product.description }}</td>{% endif %}
-            {% if "EAN_code" in selected_columns %}<td>{{ product.EAN_code }}</td>{% endif %}
-            {% if "dealer_price" in selected_columns %}<td>{{ product.dealer_price }}</td>{% endif %}
-            {% if "volumn_price" in selected_columns %}<td>{{ product.volumn_price }}</td>{% endif %}
-            {% if "MSRP" in selected_columns %}<td>{{ product.MSRP }}</td>{% endif %}
-            {% if "total" in selected_columns %}<td>{{ product.total_quantity }}</td>{% endif %}
-            <td>
-                <a href="{% url 'view_product_details' product.id %}">
-                    <button>details</button>
-                </a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="{{ selected_columns|length|add:1 }}" style="text-align: center; font-weight: bold;">No products found.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="result">
+    <table id="result_list">
+        <thead>
+            <tr>
+                {% if "brand" in selected_columns %}<th>Brand</th>{% endif %}
+                {% if "model" in selected_columns %}<th>Model</th>{% endif %}
+                {% if "description" in selected_columns %}<th>Description</th>{% endif %}
+                {% if "EAN_code" in selected_columns %}<th>EAN code</th>{% endif %}
+                {% if "dealer_price" in selected_columns %}<th>Dealer price</th>{% endif %}
+                {% if "volumn_price" in selected_columns %}<th>Volumn price</th>{% endif %}
+                {% if "MSRP" in selected_columns %}<th>MSRP</th>{% endif %}
+                {% if "total" in selected_columns %}<th>Total</th>{% endif %}
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                {% if "brand" in selected_columns %}<td>{{ product.brand }}</td>{% endif %}
+                {% if "model" in selected_columns %}<td>{{ product.model }}</td>{% endif %}
+                {% if "description" in selected_columns %}<td>{{ product.description }}</td>{% endif %}
+                {% if "EAN_code" in selected_columns %}<td>{{ product.EAN_code }}</td>{% endif %}
+                {% if "dealer_price" in selected_columns %}<td>{{ product.dealer_price }}</td>{% endif %}
+                {% if "volumn_price" in selected_columns %}<td>{{ product.volumn_price }}</td>{% endif %}
+                {% if "MSRP" in selected_columns %}<td>{{ product.MSRP }}</td>{% endif %}
+                {% if "total" in selected_columns %}<td>{{ product.total_quantity }}</td>{% endif %}
+                <td>
+                    <a href="{% url 'view_product_details' product.id %}">
+                        <button>details</button>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="{{ selected_columns|length|add:1 }}" style="text-align: center; font-weight: bold;">No products found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
-<a href="{% url 'export_to_excel' 'products' %}">Export to Excel</a>
+<div class="submit-row">
+    <a href="{% url 'export_to_excel' 'products' %}">Export to Excel</a>
+</div>
 {% endblock %}
