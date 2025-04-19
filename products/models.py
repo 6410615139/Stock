@@ -67,7 +67,7 @@ class SerialImportTransaction(models.Model):
         return {
             "Created At": self.created_at.strftime("%Y-%m-%d %H:%M"),
             "Imported By": self.imported_by.username if self.imported_by else "Unknown",
-            "Model": self.model.model,
+            "Model": self.product.model,
             "Quantity": self.quantity,
         }
 
@@ -86,7 +86,7 @@ class Transaction(models.Model):
         return {
             "Created At": self.created_at.strftime("%Y-%m-%d %H:%M"),
             "Imported By": self.imported_by.username if self.imported_by else "Unknown",
-            "Model": self.model.model,
+            "Model": self.product.model,
             "Quantity": self.quantity,
             "Source Branch": self.source.branch,
             "Destination Branch": self.destination.branch,
@@ -103,6 +103,6 @@ class BranchProduct(models.Model):
     def to_excel_row(self):
             return {
                 "Branch": self.branch.branch,
-                "Product Model": self.model.model,
+                "Product Model": self.product.model,
                 "Quantity": self.quantity,
             }

@@ -356,6 +356,7 @@ def export_to_excel(request, instance):
         "branches": Branch,
         "serials": Serial,
         "branchproducts": BranchProduct,
+        "transactions": Transaction,  # ✅ add this
     }
 
     model = model_map.get(instance)
@@ -365,29 +366,37 @@ def export_to_excel(request, instance):
     filters = request.GET.dict()
     queryset = model.objects.filter(**filters)
 
+    # Add select_related() for performance based on model
     if instance == "serials":
         queryset = queryset.select_related("product")
     elif instance == "branchproducts":
-        queryset = queryset.select_related("branch", "model")
+        queryset = queryset.select_related("branch", "product")
+    elif instance == "transactions":
+        queryset = queryset.select_related("product", "source", "destination", "imported_by")
 
     data = [obj.to_excel_row() for obj in queryset]
     df = pd.DataFrame(data)
 
-    # Build filename suffix from both model name and branch name if present
+    # Filename suffix: model and/or branch for branchproducts or transactions
     suffix_parts = []
-    if instance == "branchproducts":
+    if instance in ["branchproducts", "transactions"]:
         model_name = request.GET.get("model__model")
-        branch_name = request.GET.get("branch__branch")
+        source_branch = request.GET.get("source__branch")
+        destination_branch = request.GET.get("destination__branch")
         if model_name:
             suffix_parts.append(slugify(model_name))
-        if branch_name:
-            suffix_parts.append(slugify(branch_name))
+        if source_branch:
+            suffix_parts.append("from-" + slugify(source_branch))
+        if destination_branch:
+            suffix_parts.append("to-" + slugify(destination_branch))
 
     suffix = "-" + "-".join(suffix_parts) if suffix_parts else ""
 
     filename = f"{now().strftime('%Y-%m-%d')}-{instance}{suffix}.xlsx"
 
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     df.to_excel(response, index=False)
     return response
