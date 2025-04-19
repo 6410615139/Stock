@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
+
 
 import pandas as pd
 from .forms import ProductForm, UploadExcelForm, SerialForm, TransactionForm, MultipleSerialForm
@@ -10,7 +11,7 @@ from .models import (
     BranchProduct, Transaction
 )
 from django.db.models import Sum
-
+from django.utils.timezone import now
 from dal import autocomplete
 
 class BranchAutocomplete(autocomplete.Select2QuerySetView):
@@ -59,11 +60,6 @@ def home(request):
             Q(brand__icontains=query) | 
             Q(model__icontains=query) |
             Q(EAN_code__icontains=query)
-        )
-
-    for product in products:
-        product.total_quantity = sum(
-            item.quantity for item in product.branchproduct_set.all()
         )
 
     viewModel = {
@@ -121,37 +117,6 @@ def add_product(request):
     }
 
     return render(request, 'add_product.html', viewModel)
-
-@login_required
-def export_to_excel(request):
-    # Fetch all products
-    products = Product.objects.all()
-
-    # Prepare data for export
-    data = [
-        {
-            'Timestamp': p.tstamp.strftime('%Y-%m-%d %H:%M'),
-            'Image': p.image.url if p.image else None,
-            'Serial Number': p.serial_number,
-            'Name': p.name,
-            'Model': p.model,
-            'Purchase Date': p.purchase_date.strftime('%Y-%m-%d'),
-            'Warranty Period (months)': p.warranty_period,
-            'Claim Active': 'Yes' if p.is_claim_active() else 'No',
-        }
-        for p in products
-    ]
-
-    # Create DataFrame
-    df = pd.DataFrame(data)
-
-    # Create HTTP response with Excel file
-    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-    response['Content-Disposition'] = 'attachment; filename="products.xlsx"'
-
-    # Export DataFrame to Excel
-    df.to_excel(response, index=False)
-    return response
 
 @login_required
 def branches(request):
@@ -357,3 +322,36 @@ def add_transaction(request):
         form = TransactionForm()
 
     return render(request, 'add_transaction.html', {'form': form})
+
+@login_required
+def export_to_excel(request, instance):
+    # Mapping instance name to model queryset
+    model_map = {
+        "products": Product,
+        "branches": Branch,
+        "serials": Serial,
+    }
+
+    model = model_map.get(instance)
+    if not model:
+        raise Http404("Invalid export type")
+
+    # Get all query params for filtering
+    filters = request.GET.dict()
+
+    # Build filtered queryset
+    queryset = model.objects.filter(**filters)
+
+    # Add .select_related if needed (Serial)
+    if instance == "serials":
+        queryset = queryset.select_related("product")
+
+    # Call .to_excel_row() for each instance
+    data = [obj.to_excel_row() for obj in queryset]
+    df = pd.DataFrame(data)
+
+    filename = f"{now().strftime('%Y-%m-%d')}-{instance}.xlsx"
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    df.to_excel(response, index=False)
+    return response
