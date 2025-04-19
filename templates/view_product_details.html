@@ -54,7 +54,7 @@
     </tbody>
 </table>
 
-<a href="{% url 'export_to_excel' 'branchproducts' %}?model__model={{ product.model }}&branch__branch__icontains={{ branch_q|urlencode }}">
+<a href="{% url 'export_to_excel' 'branchproducts' %}?product__model={{ product.model }}&branch__branch__icontains={{ branch_q|urlencode }}">
     <button>Export to Excel</button>
 </a>
 {% else %}
@@ -96,7 +96,7 @@
     </tbody>
 </table>
 
-<a href="{% url 'export_to_excel' 'transactions' %}?model__model={{ product.model }}&source__branch__icontains={{ txn_q|urlencode }}">
+<a href="{% url 'export_to_excel' 'transactions' %}?product__model={{ product.model }}&source__branch__icontains={{ txn_q|urlencode }}">
     <button>Export Transactions to Excel</button>
 </a>
 {% else %}

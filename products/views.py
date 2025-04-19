@@ -356,7 +356,7 @@ def export_to_excel(request, instance):
         "branches": Branch,
         "serials": Serial,
         "branchproducts": BranchProduct,
-        "transactions": Transaction,  # ✅ add this
+        "transactions": Transaction,
     }
 
     model = model_map.get(instance)

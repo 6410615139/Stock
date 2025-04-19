@@ -101,8 +101,8 @@ class BranchProduct(models.Model):
         return f"{self.branch.branch} - {self.product.model} ({self.quantity})"
 
     def to_excel_row(self):
-            return {
-                "Branch": self.branch.branch,
-                "Product Model": self.product.model,
-                "Quantity": self.quantity,
-            }
+        return {
+            "Branch": self.branch.branch,
+            "Product Model": self.product.model,
+            "Quantity": self.quantity,
+        }

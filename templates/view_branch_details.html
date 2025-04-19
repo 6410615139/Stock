@@ -48,7 +48,7 @@
     </tbody>
 </table>
 
-<a href="{% url 'export_to_excel' 'branchproducts' %}?branch__branch={{ branch.branch|urlencode }}&model__model__icontains={{ product_q|urlencode }}">
+<a href="{% url 'export_to_excel' 'branchproducts' %}?branch__branch={{ branch.branch|urlencode }}&product__model__icontains={{ product_q|urlencode }}">
     <button>Export to Excel</button>
 </a>
 
