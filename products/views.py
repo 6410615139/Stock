@@ -73,12 +73,15 @@ def view_product_list(request):
     
     return render(request, 'view_product_list.html', viewModel)
 
+@login_required
 def view_product_details(request, id):
-    product = Product.objects.get(id=id)
-    viewModel = {
-        'product': product,
-    }
-    return render(request, 'view_product_details.html', viewModel)
+    product = get_object_or_404(Product, id=id)
+    transactions = Transaction.objects.filter(model=product).select_related("source", "destination", "imported_by").order_by("-created_at")
+
+    return render(request, "view_product_details.html", {
+        "product": product,
+        "transactions": transactions,
+    })
 
 @user_passes_test(admin_check)
 def add_product(request):

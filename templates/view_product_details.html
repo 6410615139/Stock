@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block title %}Product Details{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/table.css' %}">
+<link rel="stylesheet" href="{% static 'css/search-bar.css' %}">
+{% endblock %}
 
 {% block content %}
 <h2>Product Details</h2>
@@ -47,6 +52,39 @@
 <p>This product is not stocked at any branches.</p>
 {% endif %}
 
+<h3>Transactions for This Product</h3>
+
+{% if transactions %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Created At</th>
+            <th>Imported By</th>
+            <th>Quantity</th>
+            <th>Source</th>
+            <th>Destination</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for t in transactions %}
+        <tr>
+            <td>{{ t.created_at|date:"Y-m-d H:i" }}</td>
+            <td>{{ t.imported_by.username|default:"—" }}</td>
+            <td>{{ t.quantity }}</td>
+            <td>{{ t.source.branch }}</td>
+            <td>{{ t.destination.branch }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'export_to_excel' 'transactions' %}?model__model={{ product.model }}">
+    <button>Export Transactions to Excel</button>
+</a>
+
+{% else %}
+<p>No transactions recorded for this product.</p>
+{% endif %}
 
 <br>
 <a href="{% url 'view_product_list' %}">← Back to Product List</a>
