@@ -106,30 +106,34 @@ def add_product(request):
     if request.method == 'POST':
         if 'excel_file' in request.FILES:
             excel_form = UploadExcelForm(request.POST, request.FILES)
+            form = ProductForm()  # re-render in case Excel form is invalid
+
             if excel_form.is_valid():
                 excel_file = request.FILES['excel_file']
                 df = pd.read_excel(excel_file)
 
-                # Convert DataFrame to Products
                 for _, row in df.iterrows():
-                    warranty_period = row.get('Warranty Period (months)', 0)
-                    if not (0 <= warranty_period <= 120):  # Validate warranty period
-                        raise ValueError(f"Invalid warranty period: {warranty_period}")
-                    
-                    Product.objects.create(
-                        name=row['Name'],
-                        model=row['Model'],
-                        serial_number=row['Serial Number'],
-                        purchase_date=pd.to_datetime(row['Purchase Date']).date(),
-                        warranty_period=int(warranty_period),
-                        image=row.get('Image', None),
-                    )
-                return redirect('home')
+                    try:
+                        # Gracefully handle missing values
+                        Product.objects.create(
+                            brand=row.get('Brand', ''),
+                            model=row.get('Model', ''),
+                            description=row.get('Description', ''),
+                            EAN_code=row.get('EAN Code', ''),
+                            dealer_price=float(row.get('Dealer Price', 0)),
+                            volumn_price=float(row.get('Volumn Price', 0)),
+                            MSRP=float(row.get('MSRP', 0)),
+                        )
+                    except Exception as e:
+                        print(f"Error creating product from row: {row} -> {e}")
+                        continue
+
+                return redirect('view_product_list')
         else:
             form = ProductForm(request.POST, request.FILES)
             if form.is_valid():
                 form.save()
-                return redirect('home')
+                return redirect('view_product_list')
     else:
         form = ProductForm()
         excel_form = UploadExcelForm()
@@ -156,14 +160,14 @@ def view_branch_details(request, id):
     product_q = request.GET.get("product_q", "")
     txn_q = request.GET.get("txn_q", "")
 
-    products = BranchProduct.objects.select_related("model").filter(branch=branch)
+    products = BranchProduct.objects.select_related("product").filter(branch=branch)
     if product_q:
         products = products.filter(
             Q(model__model__icontains=product_q) |
             Q(model__brand__icontains=product_q)
         )
 
-    transactions = Transaction.objects.select_related("model", "imported_by", "source", "destination").filter(
+    transactions = Transaction.objects.select_related("product", "imported_by", "source", "destination").filter(
         Q(source=branch) | Q(destination=branch)
     )
     if txn_q:
@@ -217,8 +221,8 @@ def add_serial(request):
                 model_counter = {}
 
                 for _, row in df.iterrows():
-                    serial_number = row.get('Serial Number')
-                    model_name = row.get('Model')
+                    serial_number = row.get('Serial')
+                    model_name = row.get('Product Model')
 
                     try:
                         product = Product.objects.get(model=model_name)
@@ -228,7 +232,7 @@ def add_serial(request):
                         continue
 
                 _process_import_transaction(model_counter, request.user)
-                return redirect('serial')
+                return redirect('view_serial_list')
 
         # ✅ Multiple serials via textarea
         elif submit_type == 'multiple':
@@ -251,7 +255,7 @@ def add_serial(request):
                     print(f"❌ Product model '{model_name}' not found")
 
                 _process_import_transaction(model_counter, request.user)
-                return redirect('serial')
+                return redirect('view_serial_list')
 
         # ✅ Single serial input
         elif submit_type == 'single':
@@ -260,7 +264,7 @@ def add_serial(request):
                 serial = form.save()
                 model_name = serial.product.model
                 _process_import_transaction({model_name: 1}, request.user)
-                return redirect('serial')
+                return redirect('view_serial_list')
 
     else:
         form = SerialForm()
@@ -284,7 +288,7 @@ def _process_import_transaction(model_counter, user):
             # Create SerialImportTransaction
             SerialImportTransaction.objects.create(
                 imported_by=user,
-                model=product,
+                product=product,
                 quantity=quantity
             )
 
@@ -307,13 +311,13 @@ def add_transaction(request):
         if form.is_valid():
             transaction = form.save(commit=False)
 
-            product_model = transaction.model  # this is a Product instance if you changed to ForeignKey
+            product = transaction.product  # this is a Product instance if you changed to ForeignKey
             quantity = transaction.quantity
             source_branch = transaction.source
             destination_branch = transaction.destination
 
             # Get source stock
-            source_stock = BranchProduct.objects.filter(branch=source_branch, product=product_model).first()
+            source_stock = BranchProduct.objects.filter(branch=source_branch, product=product).first()
             if not source_stock or source_stock.quantity < quantity:
                 form.add_error('quantity', f"Not enough stock in {source_branch}. Available: {source_stock.quantity if source_stock else 0}")
                 return render(request, 'add_transaction.html', {'form': form})
@@ -325,7 +329,7 @@ def add_transaction(request):
             # ✅ Add to destination (get or create)
             dest_stock, _ = BranchProduct.objects.get_or_create(
                 branch=destination_branch,
-                product=product_model,
+                product=product,
                 defaults={'quantity': 0}
             )
             dest_stock.quantity += quantity

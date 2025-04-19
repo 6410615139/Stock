@@ -39,9 +39,9 @@
     <tbody>
         {% for item in products %}
         <tr>
-            <td>{{ item.model.brand }}</td>
-            <td>{{ item.model.model }}</td>
-            <td>{{ item.model.description }}</td>
+            <td>{{ item.product.brand }}</td>
+            <td>{{ item.product.model }}</td>
+            <td>{{ item.product.description }}</td>
             <td>{{ item.quantity }}</td>
         </tr>
         {% endfor %}

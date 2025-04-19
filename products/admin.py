@@ -23,22 +23,22 @@ class BranchAdmin(admin.ModelAdmin):
 
 @admin.register(SerialImportTransaction)
 class SerialImportTransactionAdmin(admin.ModelAdmin):
-    list_display = ('created_at', 'imported_by', 'model', 'quantity')
-    list_filter = ('created_at', 'imported_by', 'model')
-    search_fields = ('model__model', 'imported_by__username')
+    list_display = ('created_at', 'imported_by', 'product', 'quantity')
+    list_filter = ('created_at', 'imported_by', 'product')
+    search_fields = ('product__model', 'imported_by__username')
 
 
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
-    list_display = ('created_at', 'imported_by', 'model', 'quantity', 'source', 'destination')
-    list_filter = ('created_at', 'imported_by', 'model', 'source', 'destination')
-    search_fields = ('model__model', 'imported_by__username')
+    list_display = ('created_at', 'imported_by', 'product', 'quantity', 'source', 'destination')
+    list_filter = ('created_at', 'imported_by', 'product', 'source', 'destination')
+    search_fields = ('product__model', 'imported_by__username')
 
 
 @admin.register(BranchProduct)
 class BranchProductAdmin(admin.ModelAdmin):
     list_display = ('branch', 'product_model', 'quantity')
-    list_filter = ('branch', 'model')  # ← only direct ForeignKeys allowed
+    list_filter = ('branch', 'product')  # ← only direct ForeignKeys allowed
     search_fields = ('branch__branch', 'product__model')
 
     def product_model(self, obj):

@@ -60,7 +60,7 @@ class Branch(models.Model):
 class SerialImportTransaction(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     imported_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    model = models.ForeignKey(Product, on_delete=models.PROTECT)
+    product = models.ForeignKey(Product, on_delete=models.PROTECT)
     quantity = models.IntegerField()
 
     def to_excel_row(self):
@@ -74,7 +74,7 @@ class SerialImportTransaction(models.Model):
 class Transaction(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     imported_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    model = models.ForeignKey(Product, on_delete=models.PROTECT)
+    product = models.ForeignKey(Product, on_delete=models.PROTECT)
     quantity = models.IntegerField()
     source = models.ForeignKey(Branch, on_delete=models.PROTECT, null=False, blank=False, related_name='source')
     destination = models.ForeignKey(Branch, on_delete=models.PROTECT, null=False, blank=False, related_name='destination')
@@ -94,7 +94,7 @@ class Transaction(models.Model):
     
 class BranchProduct(models.Model):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name='products')
-    model = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
 
     def __str__(self):

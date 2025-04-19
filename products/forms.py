@@ -11,9 +11,9 @@ class ProductForm(forms.ModelForm):
 class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction
-        fields = ['model', 'quantity', 'source', 'destination']
+        fields = ['product', 'quantity', 'source', 'destination']
         widgets = {
-            'model': ModelSelect2(url='product-autocomplete'),
+            'product': ModelSelect2(url='product-autocomplete'),
             'source': ModelSelect2(url='branch-autocomplete'),
             'destination': ModelSelect2(url='branch-autocomplete'),
         }
