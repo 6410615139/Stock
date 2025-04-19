@@ -1,47 +1,53 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Stock{% endblock %}</title>
-        <link rel="stylesheet" href="{% static 'css/nav-bar.css' %}">
-        <link rel="stylesheet" href="{% static 'admin/css/vendor/select2/select2.css' %}">
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="{% static 'admin/js/vendor/select2/select2.full.js' %}"></script>
-        {% block style %}
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                $('#id_source').select2();  // Optional fallback if needed
-                $('#id_destination').select2();
-            });
-        </script>
-        <link rel="stylesheet" href="{% static 'css/page.css' %}">
-        {% endblock %}
-    </head>
-<body>
-    <header class="nav-bar">
-        <div>
-        </div>
-        <div class="nav-links">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Stock{% endblock %}</title>
+
+    <!-- Admin & site styles -->
+    <link rel="stylesheet" href="{% static 'css/nav-bar.css' %}">
+    <link rel="stylesheet" href="{% static 'admin/css/vendor/select2/select2.css' %}">
+    <link rel="stylesheet" href="{% static 'admin/css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">
+    <link rel="stylesheet" href="{% static 'admin/css/widgets.css' %}">
+    <link rel="stylesheet" href="{% static 'admin/css/responsive.css' %}">
+    <link rel="stylesheet" href="{% static 'admin/css/dashboard.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'admin/js/vendor/select2/select2.full.js' %}"></script>
+
+    {% block style %}{% endblock %}
+</head>
+
+<body class="{% block body_class %}{% endblock %}">
+    <div id="container">
+        <div id="header">
+            <div id="branding">
+                <h1 id="site-name"><a href="/">Stock Management System</a></h1>
+            </div>
+
             {% if user.is_authenticated %}
-            <a href="{% url 'view_product_list' %}">Product List</a>
-            <a href="{% url 'add_product' %}">+Product Type</a>
-            <a href="{% url 'view_serial_list' %}">Serial</a>
-            <a href="{% url 'add_serial' %}">+Serial</a>
-            <a href="{% url 'view_branch_list' %}">Branch</a>
-            <a href="{% url 'view_transaction_list' %}">Transaction</a>
-            <a href="{% url 'add_transaction' %}">+Transaction</a>
-                <form method="post" action="{% url 'logout' %}">
+            <div id="user-tools">
+                <a href="{% url 'view_product_list' %}">Product List</a> / 
+                <a href="{% url 'add_product' %}">+Product Type</a> / 
+                <a href="{% url 'view_serial_list' %}">Serial</a> / 
+                <a href="{% url 'add_serial' %}">+Serial</a> / 
+                <a href="{% url 'view_branch_list' %}">Branch</a> / 
+                <a href="{% url 'view_transaction_list' %}">Transaction</a> / 
+                <a href="{% url 'add_transaction' %}">+Transaction</a> / 
+                <form id="logout-form" method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
                     <button type="submit">Logout</button>
                 </form>
-            {% else %}
-                <a href="{% url 'login' %}">Login</a>
+            </div>
             {% endif %}
-        </div>
-    </header>
-    <main class="page">
+        </header>
+
+    </div>
+    <main id="content-start" class="content">
         {% block content %}{% endblock %}
     </main>
 </body>
+
 </html>

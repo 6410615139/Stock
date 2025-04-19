@@ -1,32 +1,54 @@
-{% extends "base.html" %}
 {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>IT Stock: Staff login</title>
 
-{% block title %}Login{% endblock %}
+    <link rel="stylesheet" href="{% static 'admin/css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'admin/css/login.css' %}">
+    <link rel="stylesheet" href="{% static 'admin/css/responsive.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body class="login">
 
-{% block style %}
-<link rel="stylesheet" href="{% static 'css/form.css' %}">
-{% endblock %}
+<div id="container">
+    <div id="header">
+        <h1 id="site-name"><a href="/">IT Stock: Staff login</a></h1>
+    </div>
 
-{% block content %}
-<div class="form-container">
-    <h2>Login</h2>
-    {% if form.errors %}
-        <div class="error-message">
-            <p><strong>Error:</strong> Please correct the errors below.</p>
+    <div id="content" class="colM">
+        <div id="content-main">
+
+            {% if form.errors %}
+                <p class="errornote">
+                    <strong>Error:</strong> Please correct the error{% if form.errors|length > 1 %}s{% endif %} below.
+                </p>
+            {% endif %}
+
+            <form method="post" id="login-form">
+                {% csrf_token %}
+                <div class="form-row">
+                    {{ form.username.label_tag }}
+                    {{ form.username }}
+                </div>
+                <div class="form-row">
+                    {{ form.password.label_tag }}
+                    {{ form.password }}
+                </div>
+
+                <div style="text-align: center;">
+                    <input type="submit" value="Log in" class="default">
+                </div>
+            </form>
+
         </div>
-    {% endif %}
-    <form method="post">
-        {% csrf_token %}
-        <label for="id_username">Username:</label>
-        {{ form.username }}
 
-        <label for="id_password">Password:</label>
-        {{ form.password }}
-
-        <button type="submit">Login</button>
-    </form>
-    <p class="signup-link">
-        <a href="{% url 'admin:login' %}">Admin Login</a>
-    </p>
+        <p class="signup-link">
+            <a href="{% url 'admin:login' %}">Admin Login</a>
+        </p>
+    </div>
 </div>
-{% endblock %}
+
+</body>
+</html>
