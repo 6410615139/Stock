@@ -343,7 +343,7 @@ def add_transaction(request):
             transaction.imported_by = request.user
             transaction.save()
 
-            return redirect('branch_details', id=destination_branch.id)
+            return redirect('view_branch_details', id=destination_branch.id)
     else:
         form = TransactionForm()
 
