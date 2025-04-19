@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+
 {% block title %}Branch Details{% endblock %}
 
 {% block style %}
@@ -15,7 +16,15 @@
     <p><strong>Details:</strong> {{ branch.details }}</p>
 </div>
 
-<h3>Products in this Branch</h3>
+<h3>Products in {{ branch.branch }}</h3>
+
+<div class="search-bar">
+    <form method="get" action="">
+        <input type="text" name="product_q" placeholder="Search products..." value="{{ product_q|default:'' }}">
+        <input type="hidden" name="txn_q" value="{{ txn_q|default:'' }}">
+        <button type="submit">Search</button>
+    </form>
+</div>
 
 {% if products %}
 <table class="table">
@@ -39,14 +48,58 @@
     </tbody>
 </table>
 
-<!-- Export to Excel button -->
-<a href="{% url 'export_to_excel' 'branchproducts' %}?branch__branch={{ branch.branch|urlencode }}">
+<a href="{% url 'export_to_excel' 'branchproducts' %}?branch__branch={{ branch.branch|urlencode }}&model__model__icontains={{ product_q|urlencode }}">
     <button>Export to Excel</button>
 </a>
 
 {% else %}
-<p>No products available in this branch.</p>
+<p>No products available in {{ branch.branch }}.</p>
 {% endif %}
+
+<h3>Transactions involving {{ branch.branch }}</h3>
+
+<div class="search-bar">
+    <form method="get" action="">
+        <input type="text" name="txn_q" placeholder="Search transactions..." value="{{ txn_q|default:'' }}">
+        <input type="hidden" name="product_q" value="{{ product_q|default:'' }}">
+        <button type="submit">Search</button>
+    </form>
+</div>
+
+{% if transactions %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Created At</th>
+            <th>Imported By</th>
+            <th>Model</th>
+            <th>Quantity</th>
+            <th>Source</th>
+            <th>Destination</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for t in transactions %}
+        <tr>
+            <td>{{ t.created_at|date:"Y-m-d H:i" }}</td>
+            <td>{{ t.imported_by.username|default:"—" }}</td>
+            <td>{{ t.model.model }}</td>
+            <td>{{ t.quantity }}</td>
+            <td>{{ t.source.branch }}</td>
+            <td>{{ t.destination.branch }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{% url 'export_to_excel' 'transactions' %}?{{ txn_q|urlencode }}&source__branch={{ branch.branch|urlencode }}&destination__branch={{ branch.branch|urlencode }}">
+    <button>Export Transactions to Excel</button>
+</a>
+
+{% else %}
+<p>No transactions found for this branch.</p>
+{% endif %}
+
 <br>
 <a href="{% url 'view_branch_list' %}">← Back to Branch List</a>
 {% endblock %}

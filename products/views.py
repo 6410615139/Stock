@@ -152,14 +152,33 @@ def view_branch_list(request):
 @login_required
 def view_branch_details(request, id):
     branch = get_object_or_404(Branch, id=id)
-    products = BranchProduct.objects.filter(branch=branch)
 
-    viewModel = {
-        'branch': branch,
-        'products': products,
-    }
+    product_q = request.GET.get("product_q", "")
+    txn_q = request.GET.get("txn_q", "")
 
-    return render(request, 'view_branch_details.html', viewModel)
+    products = BranchProduct.objects.select_related("model").filter(branch=branch)
+    if product_q:
+        products = products.filter(
+            Q(model__model__icontains=product_q) |
+            Q(model__brand__icontains=product_q)
+        )
+
+    transactions = Transaction.objects.select_related("model", "imported_by", "source", "destination").filter(
+        Q(source=branch) | Q(destination=branch)
+    )
+    if txn_q:
+        transactions = transactions.filter(
+            Q(model__model__icontains=txn_q) |
+            Q(imported_by__username__icontains=txn_q)
+        )
+
+    return render(request, "view_branch_details.html", {
+        "branch": branch,
+        "product_q": product_q,
+        "txn_q": txn_q,
+        "products": products,
+        "transactions": transactions,
+    })
 
 @login_required
 def view_serial_list(request):
