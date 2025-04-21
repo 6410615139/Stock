@@ -51,25 +51,6 @@
     </div>
 </div>
 
-Chatbot HTML
-<div id="chatbot-button">💬</div>
-<div id="chatbot-container">
-    <div id="chatbot-header">Vertex AI ChatBot</div>
-    <div id="chat-messages"></div>
-    <div id="chat-input-container">
-        <input id="chat-input" type="text" placeholder="Type your message..." />
-        <button onclick="sendMessage()">Send</button>
-    </div>
-</div>
-
-<!-- Load chatbot CSS & JS -->
-<link rel="stylesheet" href="{% static 'css/chatbot.css' %}">
-<script src="{% static 'js/chatbot.js' %}"></script>
-<script>
-    const chatbotUrl = "{% url 'chatbot' %}";
-    const csrfToken = "{{ csrf_token }}";
-</script>
-
 </body>
 
 </html>
