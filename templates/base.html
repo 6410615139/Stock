@@ -29,6 +29,7 @@
 
             {% if user.is_authenticated %}
             <div id="user-tools">
+                Welcom, <strong>{{ user.username }}</strong>. 
                 <a href="{% url 'view_product_list' %}">ชนิดสินค้า</a> /
                 <a href="{% url 'add_product' %}">เพิ่มชนิดสินค้า</a> /
                 <a href="{% url 'view_serial_list' %}">Serial</a> /
