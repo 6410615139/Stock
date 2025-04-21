@@ -8,10 +8,10 @@
 {% endblock %}
 
 {% block content %}
-<h1>Add Product</h1>
+<h1>เพิ่มชนิดสินค้า</h1>
 
 <!-- Single Product Form -->
-<h2>Add a Single Product</h2>
+<h2>เพิ่มทีละสินค้า</h2>
 <form method="post" enctype="multipart/form-data" class="aligned">
     {% csrf_token %}
     {{ form.as_p }}
