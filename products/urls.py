@@ -20,4 +20,5 @@ urlpatterns = [
     # excel export
     path('export_to_excel/<str:instance>', views.export_to_excel, name='export_to_excel'),
 
+    path('chatbot/', views.chatbot, name='chatbot'),
 ]

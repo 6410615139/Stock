@@ -427,3 +427,15 @@ def view_transaction_list(request):
         "transactions": transactions,
         "query": query,
     })
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+@csrf_exempt
+def chatbot(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        prompt = data.get('message', '')
+        # Replace with real Vertex AI logic later
+        return JsonResponse({'reply': f'You said: {prompt}'})
