@@ -24,7 +24,7 @@
 
 <!-- Excel Upload Form -->
 <h2>Upload Excel File</h2>
-<form method="post" enctype="multipart/form-data">
+<form method="post" enctype="multipart/form-data" class="aligned">
     {% csrf_token %}
     {{ excel_form.as_p }}
     <div class="submit-row">

@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-<h2>Product Details</h2>
+<h1>รายละเอียดสินค้า {{ product.model }}</h1>
 
 <div class="card">
     <p><strong>Brand:</strong> {{ product.brand }}</p>
@@ -18,13 +18,13 @@
     <p><strong>MSRP:</strong> {{ product.MSRP }}</p>
 </div>
 
-<h3>Available at Branches</h3>
+<h3>คงอยู่ในสาขา</h3>
 
 <div class="search-bar">
     <form method="get" action="">
-        <input type="text" name="branch_q" placeholder="Search branches..." value="{{ branch_q|default:'' }}">
+        <input type="text" name="branch_q" placeholder="ค้นหาสาขา..." value="{{ branch_q|default:'' }}">
         <input type="hidden" name="txn_q" value="{{ txn_q|default:'' }}">
-        <button type="submit">Search</button>
+        <input type="submit" value="Search">
     </form>
 </div>
 
@@ -43,8 +43,8 @@
             <td>{{ item.branch.branch }}</td>
             <td>{{ item.quantity }}</td>
             <td>
-                <a href="{% url 'view_branch_details' item.branch.id %}">
-                    <button>View Branch</button>
+                <a class="button" href="{% url 'view_branch_details' item.branch.id %}">
+                    รายละเอียด
                 </a>
             </td>
         </tr>
@@ -53,7 +53,7 @@
 </table>
 
 <a href="{% url 'export_to_excel' 'branchproducts' %}?product__model={{ product.model }}&branch__branch__icontains={{ branch_q|urlencode }}">
-    <button>Export to Excel</button>
+    Export to Excel
 </a>
 {% else %}
 <p>This product is not stocked at any matching branches.</p>
@@ -64,9 +64,9 @@
 
 <div class="search-bar">
     <form method="get" action="">
-        <input type="text" name="txn_q" placeholder="Search transactions..." value="{{ txn_q|default:'' }}">
+        <input type="text" name="txn_q" placeholder="ค้นหาธุรกรรม..." value="{{ txn_q|default:'' }}">
         <input type="hidden" name="branch_q" value="{{ branch_q|default:'' }}">
-        <button type="submit">Search</button>
+        <input type="submit" value="Search">
     </form>
 </div>
 
@@ -95,13 +95,13 @@
 </table>
 
 <a href="{% url 'export_to_excel' 'transactions' %}?product__model={{ product.model }}&source__branch__icontains={{ txn_q|urlencode }}">
-    <button>Export Transactions to Excel</button>
+    Export Transactions to Excel
 </a>
 {% else %}
 <p>No transactions recorded for {{ product.model }}.</p>
 {% endif %}
 
-
+<br>
 <br>
 <a href="{% url 'view_product_list' %}">← Back to Product List</a>
 {% endblock %}

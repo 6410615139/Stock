@@ -11,10 +11,12 @@
 {% block content %}
 <h1>Create Transaction</h1>
 
-<form method="post">
+<form method="post" class="aligned">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Create transaction</button>
+    <div class="submit-row">
+        <input type="submit" value="Create transaction" class="button">
+    </div>
 </form>
 
 <hr>

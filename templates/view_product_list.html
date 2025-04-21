@@ -74,9 +74,7 @@
             {% endfor %}
         </tbody>
     </table>
-    <div class="paginator">
-        <a href="{% url 'export_to_excel' 'products' %}">Export to Excel</a>
-    </div>
+    <a href="{% url 'export_to_excel' 'products' %}">Export to Excel</a>
 </div>
 
 {% endblock %}

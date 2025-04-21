@@ -7,20 +7,25 @@
 {% endblock %}
 
 {% block content %}
-<h2>Branch Details</h2>
 
-<div class="card">
-    <p><strong>Branch Name:</strong> {{ branch.branch }}</p>
-    <p><strong>Details:</strong> {{ branch.details }}</p>
-</div>
+<h1>สาขา {{ branch.branch }}</h1>
+<h2><strong>รายละเอียด:</strong> {{ branch.details }}</h2>
 
-<h3>Products in {{ branch.branch }}</h3>
+<h3>สินค้าในสาขา {{ branch.branch }}</h3>
+
+<ul class="object-tools">
+    <li>
+        <a href="{% url 'add_transaction' %}" class="addlink">โอนย้ายสินค้า</a>
+    </li>
+</ul>
 
 <div class="search-bar">
-    <form method="get" action="">
-        <input type="text" name="product_q" placeholder="Search products..." value="{{ product_q|default:'' }}">
-        <input type="hidden" name="txn_q" value="{{ txn_q|default:'' }}">
-        <button type="submit">Search</button>
+    <form method="get" action="" >
+        <div>
+            <input type="text" name="product_q" placeholder="Search products..." value="{{ product_q|default:'' }}">
+            <input type="hidden" name="txn_q" value="{{ txn_q|default:'' }}">
+            <input type="submit" value="Search">
+        </div>
     </form>
 </div>
 
@@ -47,20 +52,20 @@
 </table>
 
 <a href="{% url 'export_to_excel' 'branchproducts' %}?branch__branch={{ branch.branch|urlencode }}&product__model__icontains={{ product_q|urlencode }}">
-    <button>Export to Excel</button>
+    Export Branch Product to Excel
 </a>
 
 {% else %}
 <p>No products available in {{ branch.branch }}.</p>
 {% endif %}
 
-<h3>Transactions involving {{ branch.branch }}</h3>
+<h3>ธุรกรรมในสาขา {{ branch.branch }}</h3>
 
 <div class="search-bar">
     <form method="get" action="">
         <input type="text" name="txn_q" placeholder="Search transactions..." value="{{ txn_q|default:'' }}">
         <input type="hidden" name="product_q" value="{{ product_q|default:'' }}">
-        <button type="submit">Search</button>
+        <input type="submit" value="Search">
     </form>
 </div>
 
@@ -91,13 +96,14 @@
 </table>
 
 <a href="{% url 'export_to_excel' 'transactions' %}?{{ txn_q|urlencode }}&source__branch={{ branch.branch|urlencode }}&destination__branch={{ branch.branch|urlencode }}">
-    <button>Export Transactions to Excel</button>
+    Export Transactions to Excel
 </a>
 
 {% else %}
 <p>No transactions found for this branch.</p>
 {% endif %}
 
+<br>
 <br>
 <a href="{% url 'view_branch_list' %}">← Back to Branch List</a>
 {% endblock %}
