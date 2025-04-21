@@ -12,10 +12,12 @@
 
 <!-- Single Product Form -->
 <h2>Add a Single Product</h2>
-<form method="post" enctype="multipart/form-data">
+<form method="post" enctype="multipart/form-data" class="aligned">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Add Product</button>
+    <div class="submit-row">
+        <input type="submit" value="Add Product" class="button">
+    </div>
 </form>
 
 <hr>
@@ -25,6 +27,8 @@
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ excel_form.as_p }}
-    <button type="submit">Upload Excel</button>
+    <div class="submit-row">
+        <input type="submit" value="Upload Excel" class="button">
+    </div>
 </form>
 {% endblock %}
