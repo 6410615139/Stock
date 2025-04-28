@@ -4,7 +4,7 @@ from .models import Product, Serial, Branch, SerialImportTransaction, Transactio
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('brand', 'model', 'EAN_code', 'dealer_price', 'volumn_price', 'MSRP')
+    list_display = ('brand', 'model', 'EAN_code', 'dealer_price', 'volume_price', 'MSRP')
     search_fields = ('brand', 'model', 'EAN_code')
 
 
