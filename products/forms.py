@@ -6,7 +6,7 @@ from .models import Product, Serial, Transaction
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['brand','model', 'description', 'EAN_code', 'dealer_price', 'volumn_price', 'MSRP']
+        fields = ['brand','model', 'description', 'EAN_code', 'dealer_price', 'volume_price', 'MSRP']
 
 class TransactionForm(forms.ModelForm):
     class Meta:

@@ -56,7 +56,7 @@ def view_product_list(request):
         ("description", "Description"),
         ("EAN_code", "EAN code"),
         ("dealer_price", "Dealer Price"),
-        ("volumn_price", "Volumn Price"),
+        ("volume_price", "volume Price"),
         ("MSRP", "MSRP"),
         ("total", "Total"),
     ]
@@ -64,7 +64,7 @@ def view_product_list(request):
     # selected column setting
     selected_columns = request.GET.getlist('columns')
     if not selected_columns:
-        selected_columns = ['brand','model', 'description', 'EAN_code', 'dealer_price', 'volumn_price', 'MSRP', "total"]
+        selected_columns = ['brand','model', 'description', 'EAN_code', 'dealer_price', 'volume_price', 'MSRP', "total"]
 
     # searchbar query
     query = request.GET.get('q')  # Get the search query from the request
@@ -133,7 +133,7 @@ def add_product(request):
                             description=row.get('Description', ''),
                             EAN_code=row.get('EAN Code', ''),
                             dealer_price=float(row.get('Dealer Price', 0)),
-                            volumn_price=float(row.get('Volumn Price', 0)),
+                            volume_price=float(row.get('volume Price', 0)),
                             MSRP=float(row.get('MSRP', 0)),
                         )
                     except Exception as e:

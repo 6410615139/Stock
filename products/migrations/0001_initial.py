@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
                 ('description', models.CharField(max_length=300)),
                 ('EAN_code', models.CharField(max_length=20)),
                 ('dealer_price', models.FloatField()),
-                ('volumn_price', models.FloatField()),
+                ('volume_price', models.FloatField()),
                 ('MSRP', models.FloatField()),
             ],
         ),

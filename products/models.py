@@ -7,7 +7,7 @@ class Product(models.Model):
     description = models.CharField(max_length=300)
     EAN_code = models.CharField(max_length=20)
     dealer_price = models.FloatField()
-    volumn_price = models.FloatField()
+    volume_price = models.FloatField()
     MSRP = models.FloatField()
 
     def __str__(self):
@@ -24,7 +24,7 @@ class Product(models.Model):
             "Description": self.description,
             "EAN Code": self.EAN_code,
             "Dealer Price": self.dealer_price,
-            "Volume Price": self.volumn_price,
+            "Volume Price": self.volume_price,
             "MSRP": self.MSRP,
             "Total Quantity": self.total_quantity,
         }
