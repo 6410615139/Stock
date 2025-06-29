@@ -26,7 +26,7 @@ class Product(models.Model):
             "Dealer Price": self.dealer_price,
             "Volume Price": self.volume_price,
             "MSRP": self.MSRP,
-            "Total Quantity": self.total_quantity,
+            "Total": self.total_quantity,
         }
 
 
