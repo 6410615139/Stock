@@ -6,8 +6,7 @@
 {% endblock %}
 
 {% block content %}
-<h1>รายละเอียดสินค้า {{ product.model }}</h1>
-
+<h1>รายละเอียดสินค้า {{ product.model }}<a class="changelink" href="{% url 'update_product' product.id %}"></a></h1>
 <div class="card">
     <p><strong>Brand:</strong> {{ product.brand }}</p>
     <p><strong>Model:</strong> {{ product.model }}</p>

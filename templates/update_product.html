@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Edit Product Details{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/form.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1>แก้ไขรายละเอียดสินค้า</h1>
+
+<!-- Single Product Form -->
+<h2>Model: {{ product.model }}</h2>
+<form method="post" enctype="multipart/form-data" class="aligned">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="submit-row">
+        <input type="submit" value="Update Product" class="button">
+    </div>
+</form>
+
+<hr>
+{% endblock %}

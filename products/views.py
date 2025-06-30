@@ -172,6 +172,19 @@ def add_product(request):
     return render(request, 'add_product.html', viewModel)
 
 @login_required
+def update_product(request, id):
+    product = get_object_or_404(Product, id=id)
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES, instance=product)
+        if form.is_valid():
+            form.save()
+            return redirect('view_product_details', id=id)
+    else:
+        form = ProductForm(instance=product)
+    return render(request, 'update_product.html', {'form': form, 'product': product})
+
+
+@login_required
 def view_branch_list(request):
     branches = Branch.objects.all()
     viewModel = {
