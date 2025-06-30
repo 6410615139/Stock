@@ -2,13 +2,13 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Product(models.Model):
-    brand = models.CharField(max_length=20)
-    model = models.CharField(max_length=30)
-    description = models.CharField(max_length=300)
-    EAN_code = models.CharField(max_length=20)
-    dealer_price = models.FloatField()
-    volume_price = models.FloatField()
-    MSRP = models.FloatField()
+    brand = models.CharField(max_length=20, null=True, blank=True)
+    model = models.CharField(max_length=30, null=False, blank=False, unique=True)
+    description = models.CharField(max_length=300, null=True, blank=True)
+    EAN_code = models.CharField(max_length=20, null=True, blank=True)
+    dealer_price = models.FloatField(null=True, blank=True)
+    volume_price = models.FloatField(null=True, blank=True)
+    MSRP = models.FloatField(null=True, blank=True)
 
     def __str__(self):
         return self.model
@@ -29,46 +29,17 @@ class Product(models.Model):
             "Total": self.total_quantity,
         }
 
-
-class Serial(models.Model):
-    serial = models.CharField(max_length=30, unique=True)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='serials')
-
-    def __str__(self):
-        return f"{self.serial} - {self.product.model}"
-    
-    def to_excel_row(self):
-        return {
-            "Serial": self.serial,
-            "Product Model": self.product.model,
-            "Product Brand": self.product.brand,
-        }
-
 class Branch(models.Model):
-    branch = models.CharField(max_length=30)
-    # details = models.CharField(max_length=300, null=True, blank=True)
+    name = models.CharField(max_length=30)
+    details = models.CharField(max_length=300, null=True, blank=True)
 
     def __str__(self):
-        return self.branch
+        return self.name
     
     def to_excel_row(self):
         return {
-            "Branch Name": self.branch,
-            # "Details": self.details if self.details else "",
-        }
-    
-class SerialImportTransaction(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    imported_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
-    product = models.ForeignKey(Product, on_delete=models.PROTECT)
-    quantity = models.IntegerField()
-
-    def to_excel_row(self):
-        return {
-            "Created At": self.created_at.strftime("%Y-%m-%d %H:%M"),
-            "Imported By": self.imported_by.username if self.imported_by else "Unknown",
-            "Model": self.product.model,
-            "Quantity": self.quantity,
+            "Name": self.name,
+            "Details": self.details if self.details else "",
         }
 
 class Transaction(models.Model):
@@ -98,11 +69,39 @@ class BranchProduct(models.Model):
     quantity = models.IntegerField()
 
     def __str__(self):
-        return f"{self.branch.branch} - {self.product.model} ({self.quantity})"
+        return f"{self.branch.name} - {self.product.model} ({self.quantity})"
 
     def to_excel_row(self):
         return {
-            "Branch": self.branch.branch,
+            "Branch": self.branch.name,
             "Product Model": self.product.model,
             "Quantity": self.quantity,
         }
+    
+# class Serial(models.Model):
+#     serial = models.CharField(max_length=30, unique=True)
+#     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='serials')
+
+#     def __str__(self):
+#         return f"{self.serial} - {self.product.model}"
+    
+#     def to_excel_row(self):
+#         return {
+#             "Serial": self.serial,
+#             "Product Model": self.product.model,
+#             "Product Brand": self.product.brand,
+#         }
+
+# class SerialImportTransaction(models.Model):
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     imported_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+#     product = models.ForeignKey(Product, on_delete=models.PROTECT)
+#     quantity = models.IntegerField()
+
+#     def to_excel_row(self):
+#         return {
+#             "Created At": self.created_at.strftime("%Y-%m-%d %H:%M"),
+#             "Imported By": self.imported_by.username if self.imported_by else "Unknown",
+#             "Model": self.product.model,
+#             "Quantity": self.quantity,
+#         }

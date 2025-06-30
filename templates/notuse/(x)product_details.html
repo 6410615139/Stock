@@ -19,7 +19,7 @@
 <ul>
     {% for item in product.branchproduct_set.all %}
         <li>
-            <strong>{{ item.branch.branch }}</strong> — {{ item.branch.details }}  
+            <strong>{{ item.branch.name }}</strong> — {{ item.branch.details }}  
             <br>
             Quantity: {{ item.quantity }}
         </li>

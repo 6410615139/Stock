@@ -8,10 +8,10 @@
 
 {% block content %}
 
-<h1>สาขา {{ branch.branch }}</h1>
+<h1>สาขา {{ branch.name }}</h1>
 <h2><strong>รายละเอียด:</strong> {{ branch.details }}</h2>
 
-<h3>สินค้าในสาขา {{ branch.branch }}</h3>
+<h3>สินค้าในสาขา {{ branch.name }}</h3>
 
 <ul class="object-tools">
     <li>
@@ -51,15 +51,15 @@
     </tbody>
 </table>
 
-<a href="{% url 'export_to_excel' 'branchproducts' %}?branch__branch={{ branch.branch|urlencode }}&product__model__icontains={{ product_q|urlencode }}">
+<a href="{% url 'export_to_excel' 'branchproducts' %}?branch__branch={{ branch.name|urlencode }}&product__model__icontains={{ product_q|urlencode }}">
     Export Branch Product to Excel
 </a>
 
 {% else %}
-<p>No products available in {{ branch.branch }}.</p>
+<p>No products available in {{ branch.name }}.</p>
 {% endif %}
 
-<h3>ธุรกรรมในสาขา {{ branch.branch }}</h3>
+<h3>ธุรกรรมในสาขา {{ branch.name }}</h3>
 
 <div class="search-bar">
     <form method="get" action="">
@@ -95,7 +95,7 @@
     </tbody>
 </table>
 
-<a href="{% url 'export_to_excel' 'transactions' %}?{{ txn_q|urlencode }}&source__branch={{ branch.branch|urlencode }}&destination__branch={{ branch.branch|urlencode }}">
+<a href="{% url 'export_to_excel' 'transactions' %}?{{ txn_q|urlencode }}&source__branch={{ branch.name|urlencode }}&destination__branch={{ branch.name|urlencode }}">
     Export Transactions to Excel
 </a>
 

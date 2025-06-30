@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Product, Serial, Branch, SerialImportTransaction, Transaction, BranchProduct
+# from .models import Product, Serial, Branch, SerialImportTransaction, Transaction, BranchProduct
+from .models import Product, Branch, Transaction, BranchProduct
 
 
 @admin.register(Product)
@@ -8,24 +9,24 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ('brand', 'model', 'EAN_code')
 
 
-@admin.register(Serial)
-class SerialAdmin(admin.ModelAdmin):
-    list_display = ('serial', 'product')
-    search_fields = ('serial',)
-    list_filter = ('product',)
+# @admin.register(Serial)
+# class SerialAdmin(admin.ModelAdmin):
+#     list_display = ('serial', 'product')
+#     search_fields = ('serial',)
+#     list_filter = ('product',)
 
 
 @admin.register(Branch)
 class BranchAdmin(admin.ModelAdmin):
-    list_display = ('branch',)
-    search_fields = ('branch',)
+    list_display = ('name',)
+    search_fields = ('name',)
 
 
-@admin.register(SerialImportTransaction)
-class SerialImportTransactionAdmin(admin.ModelAdmin):
-    list_display = ('created_at', 'imported_by', 'product', 'quantity')
-    list_filter = ('created_at', 'imported_by', 'product')
-    search_fields = ('product__model', 'imported_by__username')
+# @admin.register(SerialImportTransaction)
+# class SerialImportTransactionAdmin(admin.ModelAdmin):
+#     list_display = ('created_at', 'imported_by', 'product', 'quantity')
+#     list_filter = ('created_at', 'imported_by', 'product')
+#     search_fields = ('product__model', 'imported_by__username')
 
 
 @admin.register(Transaction)

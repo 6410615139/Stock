@@ -20,7 +20,7 @@
     <tbody>
         {% for branch in branches %}
         <tr>
-            <td>{{ branch.branch }}</td>
+            <td>{{ branch.name }}</td>
             <td>
                 <a class="button" href="{% url 'view_branch_details' branch.id %}">
                     รายละเอียด

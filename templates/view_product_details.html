@@ -39,7 +39,7 @@
     <tbody>
         {% for item in branches %}
         <tr>
-            <td>{{ item.branch.branch }}</td>
+            <td>{{ item.branch.name }}</td>
             <td>{{ item.quantity }}</td>
             <td>
                 <a class="button" href="{% url 'view_branch_details' item.branch.id %}">

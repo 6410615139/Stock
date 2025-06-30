@@ -30,7 +30,7 @@ class Command(BaseCommand):
             return
 
         for name in DEFAULT_BRANCHES:
-            Branch.objects.create(branch=name)
+            Branch.objects.create(name=name)
             self.stdout.write(f"✅ Created branch: {name}")
 
         self.stdout.write(self.style.SUCCESS("🎉 Default branches initialized successfully."))
