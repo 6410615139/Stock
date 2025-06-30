@@ -10,10 +10,10 @@ import pandas as pd
 #     Product, Serial, SerialImportTransaction, Branch,
 #     BranchProduct, Transaction
 # )
-from .forms import ProductForm, UploadExcelForm, TransactionForm
+from .forms import ProductForm, UploadExcelForm, TransactionForm, ImportProductForm
 from .models import (
     Product, Branch,
-    BranchProduct, Transaction
+    BranchProduct, Transaction, Import
 )
 from django.db.models import Sum
 from django.utils.timezone import now
@@ -326,32 +326,32 @@ def view_branch_details(request, id):
 #         'multiple_serial_form': multiple_serial_form,
 #     })
 
-# ✅ Helper function to create transaction records and update stock
-def _process_import_transaction(model_counter, user):
-    hq_branch, _ = Branch.objects.get_or_create(branch="สำนักงานใหญ่")
+# # ✅ Helper function to create transaction records and update stock
+# def _process_import_transaction(model_counter, user):
+#     hq_branch, _ = Branch.objects.get_or_create(branch="สำนักงานใหญ่")
 
-    for model_name, quantity in model_counter.items():
-        try:
-            product = Product.objects.get(model=model_name)
+#     for model_name, quantity in model_counter.items():
+#         try:
+#             product = Product.objects.get(model=model_name)
 
-            # Create SerialImportTransaction
-            SerialImportTransaction.objects.create(
-                imported_by=user,
-                product=product,
-                quantity=quantity
-            )
+#             # Create SerialImportTransaction
+#             SerialImportTransaction.objects.create(
+#                 imported_by=user,
+#                 product=product,
+#                 quantity=quantity
+#             )
 
-            # Update HQ stock
-            branch_product, _ = BranchProduct.objects.get_or_create(
-                branch=hq_branch,
-                product=product,
-                defaults={'quantity': 0}
-            )
-            branch_product.quantity += quantity
-            branch_product.save()
+#             # Update HQ stock
+#             branch_product, _ = BranchProduct.objects.get_or_create(
+#                 branch=hq_branch,
+#                 product=product,
+#                 defaults={'quantity': 0}
+#             )
+#             branch_product.quantity += quantity
+#             branch_product.save()
 
-        except Product.DoesNotExist:
-            continue
+#         except Product.DoesNotExist:
+#             continue
 
 @login_required
 def add_transaction(request):
@@ -393,12 +393,62 @@ def add_transaction(request):
 
     return render(request, 'add_transaction.html', {'form': form})
 
+def import_product(request):
+    if request.method == 'POST':
+            if 'excel_file' in request.FILES:
+                excel_form = UploadExcelForm(request.POST, request.FILES)
+                form = ImportProductForm(request.POST, request.FILES)
+
+                if excel_form.is_valid():
+                    excel_file = request.FILES['excel_file']
+                    df = pd.read_excel(excel_file)
+
+                    for _, row in df.iterrows():
+                        try:
+                            # Gracefully handle missing values
+                            import_product = Import.objects.create(
+                                product=row.get('Model', ''),
+                                quantity=row.get('Quantity', ''),
+                                supplier=row.get('Supplier', '')
+                            )
+                            import_product.create_branch_product()
+
+                        except Exception as e:
+                            print(f"Error creating product from row: {row} -> {e}")
+                            continue
+
+                    return redirect('view_import_list')
+            
+            else:
+                form = ImportProductForm(request.POST, request.FILES)
+                if form.is_valid():
+                    import_product = form.save()
+                    import_product.create_branch_product()
+                    return redirect('view_import_list')
+
+    else:
+        form = ImportProductForm()
+        excel_form = UploadExcelForm()
+
+    viewModel = {
+        'form': form, 
+        'excel_form': excel_form
+    }
+        
+    return render(request, 'import_product.html', viewModel)
+
+def view_import_list(request):
+    imports = Import.objects.select_related("product", "imported_by")
+    return render(request, "view_import_list.html", {
+        "imports": imports,
+    })
+
 @login_required
 def export_to_excel(request, instance):
     model_map = {
         "products": Product,
         "branches": Branch,
-        "serials": Serial,
+        # "serials": Serial,
         "branchproducts": BranchProduct,
         "transactions": Transaction,
     }

@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from products.models import Branch
+from products.models import Branch, Supplier
 
 DEFAULT_BRANCHES = [
     "สำนักงานใหญ่",
@@ -21,6 +21,10 @@ DEFAULT_BRANCHES = [
     "ภายใน",
 ]
 
+DEFAULT_SUPPLIER = [
+    "อื่นๆ"
+]
+
 class Command(BaseCommand):
     help = "Initialize branch list if none exists"
 
@@ -33,4 +37,8 @@ class Command(BaseCommand):
             Branch.objects.create(name=name)
             self.stdout.write(f"✅ Created branch: {name}")
 
-        self.stdout.write(self.style.SUCCESS("🎉 Default branches initialized successfully."))
+        for name in DEFAULT_SUPPLIER:
+            Supplier.objects.create(name=name)
+            self.stdout.write(f"✅ Created supplier: {name}")
+
+        self.stdout.write(self.style.SUCCESS("🎉 Default objects initialized successfully."))

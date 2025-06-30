@@ -59,14 +59,56 @@ class Transaction(models.Model):
             "Imported By": self.imported_by.username if self.imported_by else "Unknown",
             "Model": self.product.model,
             "Quantity": self.quantity,
-            "Source Branch": self.source.branch,
-            "Destination Branch": self.destination.branch,
+            "Source Branch": self.source,
+            "Destination Branch": self.destination,
         }
     
+class Supplier(models.Model):
+    name = models.CharField(max_length=30)
+    details = models.CharField(max_length=300, null=True, blank=True)
+    total = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.name
+
+    def to_excel_row(self):
+        return {
+            "Name": self.name,
+            "Details": self.details if self.details else "",
+        }
+    
+class Import(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    imported_by = models.ForeignKey(User, on_delete=models.PROTECT)
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, null=False, blank=False)
+    quantity = models.IntegerField(null=False, blank=False)
+    supplier = models.ForeignKey(Supplier, on_delete=models.PROTECT, related_name='suplier', null=False, blank=False)
+
+    def __str__(self):
+        return f"Importing of {self.quantity} {self.model} from {self.suplier}"
+
+    def to_excel_row(self):
+        return {
+            "Created At": self.created_at.strftime("%Y-%m-%d %H:%M"),
+            "Imported By": self.imported_by.username if self.imported_by else "Unknown",
+            "Model": self.product.model,
+            "Quantity": self.quantity,
+            "Supplier": self.supplier,
+        }
+    
+    @classmethod
+    def create_branch_product(self):
+        branch = Branch.objects.get(name='สำนักงานใหญ่')
+        supplier = Supplier.objects.get(name="อื่นๆ")
+        product = Product.objects.get_or_create(model=product ,supplier=supplier)
+        branchProduct = BranchProduct.objects.get_or_create(branch=branch, product=self.product)
+        branchProduct.quantity += self.quantity
+
+
 class BranchProduct(models.Model):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name='products')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.IntegerField()
+    quantity = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.branch.name} - {self.product.model} ({self.quantity})"

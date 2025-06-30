@@ -32,8 +32,10 @@
                 Welcome, <strong>{{ user.username }}</strong>. 
                 <a href="{% url 'view_product_list' %}">ชนิดสินค้า</a> /
                 <a href="{% url 'add_product' %}">เพิ่มชนิดสินค้า</a> /
+                <a href="{% url 'import_product' %}">นำเข้าสินค้า</a> /
                 <a href="{% url 'view_branch_list' %}">สาขา</a> /
                 <a href="{% url 'view_transaction_list' %}">ธุรกรรม</a> /
+                <a href="{% url 'view_import_list' %}">รายการนำเข้าสินค้า</a> /
                 <a href="{% url 'add_transaction' %}">โอนย้ายสินค้า</a> /
                 <form id="logout-form" method="post" action="{% url 'logout' %}">
                     {% csrf_token %}

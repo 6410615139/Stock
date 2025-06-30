@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Import Product{% endblock %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/form.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1>นำเข้าสินค้า</h1>
+
+<!-- Single Product Form -->
+<h2>นำเข้าทีละสินค้า</h2>
+<form method="post" enctype="multipart/form-data" class="aligned">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="submit-row">
+        <input type="submit" value="Add Product" class="button">
+    </div>
+</form>
+
+<hr>
+
+<!-- Excel Upload Form -->
+<h2>Upload Excel File</h2>
+<form method="post" enctype="multipart/form-data" class="aligned">
+    {% csrf_token %}
+    {{ excel_form.as_p }}
+    <div class="submit-row">
+        <input type="submit" value="Upload Excel" class="button">
+    </div>
+</form>
+{% endblock %}

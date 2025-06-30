@@ -1,6 +1,6 @@
 from django.contrib import admin
 # from .models import Product, Serial, Branch, SerialImportTransaction, Transaction, BranchProduct
-from .models import Product, Branch, Transaction, BranchProduct
+from .models import Product, Branch, Transaction, BranchProduct, Import
 
 
 @admin.register(Product)
@@ -9,24 +9,10 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ('brand', 'model', 'EAN_code')
 
 
-# @admin.register(Serial)
-# class SerialAdmin(admin.ModelAdmin):
-#     list_display = ('serial', 'product')
-#     search_fields = ('serial',)
-#     list_filter = ('product',)
-
-
 @admin.register(Branch)
 class BranchAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
-
-
-# @admin.register(SerialImportTransaction)
-# class SerialImportTransactionAdmin(admin.ModelAdmin):
-#     list_display = ('created_at', 'imported_by', 'product', 'quantity')
-#     list_filter = ('created_at', 'imported_by', 'product')
-#     search_fields = ('product__model', 'imported_by__username')
 
 
 @admin.register(Transaction)
@@ -35,6 +21,11 @@ class TransactionAdmin(admin.ModelAdmin):
     list_filter = ('created_at', 'imported_by', 'product', 'source', 'destination')
     search_fields = ('product__model', 'imported_by__username')
 
+@admin.register(Import)
+class ImportAdmin(admin.ModelAdmin):
+    list_display = ('created_at', 'imported_by', 'product', 'quantity', 'supplier')
+    list_filter = ('created_at', 'imported_by', 'product', 'quantity', 'supplier')
+    search_fields = ('product__model', 'imported_by__username')
 
 @admin.register(BranchProduct)
 class BranchProductAdmin(admin.ModelAdmin):
@@ -46,5 +37,14 @@ class BranchProductAdmin(admin.ModelAdmin):
         return obj.product.model
     product_model.short_description = 'Product Model'
 
+# @admin.register(Serial)
+# class SerialAdmin(admin.ModelAdmin):
+#     list_display = ('serial', 'product')
+#     search_fields = ('serial',)
+#     list_filter = ('product',)
 
-
+# @admin.register(SerialImportTransaction)
+# class SerialImportTransactionAdmin(admin.ModelAdmin):
+#     list_display = ('created_at', 'imported_by', 'product', 'quantity')
+#     list_filter = ('created_at', 'imported_by', 'product')
+#     search_fields = ('product__model', 'imported_by__username')

@@ -2,7 +2,7 @@ from django import forms
 from dal import autocomplete
 from dal_select2.widgets import ModelSelect2
 # from .models import Product, Serial, Transaction
-from .models import Product, Transaction
+from .models import Product, Transaction, Import
 
 class ProductForm(forms.ModelForm):
     class Meta:
@@ -17,6 +17,15 @@ class TransactionForm(forms.ModelForm):
             'product': ModelSelect2(url='product-autocomplete'),
             'source': ModelSelect2(url='branch-autocomplete'),
             'destination': ModelSelect2(url='branch-autocomplete'),
+        }
+
+class ImportProductForm(forms.ModelForm):
+    class Meta:
+        model = Import
+        fields = ['product', 'quantity', 'supplier']
+        widgets = {
+            'product': ModelSelect2(url='product-autocomplete'),
+            'supplier': ModelSelect2(url='branch-autocomplete'),
         }
 
 class UploadExcelForm(forms.Form):
