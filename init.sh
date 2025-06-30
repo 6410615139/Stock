@@ -9,6 +9,8 @@ python manage.py migrate
 echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
+python manage.py init_branch_list
+
 # Create a superuser if not exists
 echo "Creating superuser..."
 python manage.py shell <<EOF

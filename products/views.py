@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponse, Http404
-
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger # Import Paginator
 
 import pandas as pd
 from .forms import ProductForm, UploadExcelForm, SerialForm, TransactionForm, MultipleSerialForm
@@ -75,9 +75,23 @@ def view_product_list(request):
             Q(EAN_code__icontains=query)
         )
 
+    # --- Pagination Implementation ---
+    paginator = Paginator(products, 30)  # Show 30 products per page
+    page = request.GET.get('page')
+
+    try:
+        products_page = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        products_page = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        products_page = paginator.page(paginator.num_pages)
+    # --- End Pagination Implementation ---
+
     viewModel = {
         'default': default,
-        'products': products, 
+        'products': products_page,  # Use the paginated queryset here
         'query': query, 
         'selected_columns': selected_columns,
         "available_columns": available_columns
