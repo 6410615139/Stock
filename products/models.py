@@ -79,7 +79,7 @@ class Supplier(models.Model):
     
 class Import(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    imported_by = models.ForeignKey(User, on_delete=models.PROTECT)
+    imported_by = models.ForeignKey(User, on_delete=models.PROTECT, null=False, blank=False)
     product = models.ForeignKey(Product, on_delete=models.PROTECT, null=False, blank=False)
     quantity = models.IntegerField(null=False, blank=False)
     supplier = models.ForeignKey(Supplier, on_delete=models.PROTECT, related_name='suplier', null=False, blank=False)
@@ -96,14 +96,14 @@ class Import(models.Model):
             "Supplier": self.supplier,
         }
     
-    @classmethod
     def create_branch_product(self):
         branch = Branch.objects.get(name='สำนักงานใหญ่')
-        supplier = Supplier.objects.get(name="อื่นๆ")
-        product = Product.objects.get_or_create(model=product ,supplier=supplier)
-        branchProduct = BranchProduct.objects.get_or_create(branch=branch, product=self.product)
-        branchProduct.quantity += self.quantity
-
+        branchProduct, created = BranchProduct.objects.get_or_create(
+            branch=branch,
+            product=self.product # self.product is already the Product instance linked to this Import
+        )
+        branchProduct.quantity += self.quantity # Use the quantity from the current Import instance
+        branchProduct.save()
 
 class BranchProduct(models.Model):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name='products')

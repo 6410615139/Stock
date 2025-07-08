@@ -4,6 +4,7 @@
 {% block title %}Import Product{% endblock %}
 
 {% block style %}
+{{ form.media }}
 <link rel="stylesheet" href="{% static 'css/form.css' %}">
 {% endblock %}
 
@@ -12,11 +13,11 @@
 
 <!-- Single Product Form -->
 <h2>นำเข้าทีละสินค้า</h2>
-<form method="post" enctype="multipart/form-data" class="aligned">
+<form method="post" class="aligned">
     {% csrf_token %}
     {{ form.as_p }}
     <div class="submit-row">
-        <input type="submit" value="Add Product" class="button">
+        <input type="submit" value="Import Product" class="button">
     </div>
 </form>
 

@@ -13,7 +13,7 @@ import pandas as pd
 from .forms import ProductForm, UploadExcelForm, TransactionForm, ImportProductForm
 from .models import (
     Product, Branch,
-    BranchProduct, Transaction, Import
+    BranchProduct, Transaction, Import, Supplier
 )
 from django.db.models import Sum
 from django.utils.timezone import now
@@ -28,6 +28,15 @@ class BranchAutocomplete(autocomplete.Select2QuerySetView):
         qs = Branch.objects.all()
         if self.q:
             qs = qs.filter(branch__icontains=self.q)
+        return qs
+    
+class SupplierAutocomplete(autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return Supplier.objects.none()
+        qs = Supplier.objects.all()
+        if self.q:
+            qs = qs.filter(supplier__icontains=self.q)
         return qs
 
 class ProductAutocomplete(autocomplete.Select2QuerySetView):
@@ -407,7 +416,7 @@ def import_product(request):
                         try:
                             # Gracefully handle missing values
                             import_product = Import.objects.create(
-                                product=row.get('Model', ''),
+                                product=Product.objects.get_or_create(model=row.get('Model', '')),
                                 quantity=row.get('Quantity', ''),
                                 supplier=row.get('Supplier', '')
                             )
@@ -422,7 +431,10 @@ def import_product(request):
             else:
                 form = ImportProductForm(request.POST, request.FILES)
                 if form.is_valid():
-                    import_product = form.save()
+                    import_product = form.save(commit=False)
+                    import_product.imported_by = request.user
+                    import_product.save()
+                    
                     import_product.create_branch_product()
                     return redirect('view_import_list')
 

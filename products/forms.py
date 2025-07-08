@@ -25,7 +25,7 @@ class ImportProductForm(forms.ModelForm):
         fields = ['product', 'quantity', 'supplier']
         widgets = {
             'product': ModelSelect2(url='product-autocomplete'),
-            'supplier': ModelSelect2(url='branch-autocomplete'),
+            'supplier': ModelSelect2(url='supplier-autocomplete'),
         }
 
 class UploadExcelForm(forms.Form):
