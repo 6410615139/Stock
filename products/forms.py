@@ -22,10 +22,9 @@ class TransactionForm(forms.ModelForm):
 class ImportProductForm(forms.ModelForm):
     class Meta:
         model = Import
-        fields = ['product', 'quantity', 'supplier']
+        fields = ['product', 'quantity']
         widgets = {
             'product': ModelSelect2(url='product-autocomplete'),
-            'supplier': ModelSelect2(url='supplier-autocomplete'),
         }
 
 class UploadExcelForm(forms.Form):

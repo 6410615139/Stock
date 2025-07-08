@@ -414,13 +414,24 @@ def import_product(request):
 
                     for _, row in df.iterrows():
                         try:
-                            # Gracefully handle missing values
+                            product = Product.objects.create(
+                                brand=row.get('Brand', ''),
+                                model=row.get('Model', ''),
+                                description=row.get('Description', ''),
+                                EAN_code=row.get('EAN Code', ''),
+                                dealer_price=float(row.get('Dealer Price', 0)),
+                                volume_price=float(row.get('volume Price', 0)),
+                                MSRP=float(row.get('MSRP', 0)),
+                            )
+                            supplier = Supplier.objects.get(name="อื่นๆ")
                             import_product = Import.objects.create(
-                                product=Product.objects.get_or_create(model=row.get('Model', '')),
-                                quantity=row.get('Quantity', ''),
-                                supplier=row.get('Supplier', '')
+                                product=product,
+                                imported_by = request.user,
+                                quantity=row.get('Total', ''),
+                                supplier=supplier
                             )
                             import_product.create_branch_product()
+                            import_product.save()
 
                         except Exception as e:
                             print(f"Error creating product from row: {row} -> {e}")
@@ -434,7 +445,7 @@ def import_product(request):
                     import_product = form.save(commit=False)
                     import_product.imported_by = request.user
                     import_product.save()
-                    
+
                     import_product.create_branch_product()
                     return redirect('view_import_list')
 

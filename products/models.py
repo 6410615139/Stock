@@ -104,6 +104,9 @@ class Import(models.Model):
         )
         branchProduct.quantity += self.quantity # Use the quantity from the current Import instance
         branchProduct.save()
+        supplier = self.supplier
+        supplier.total += self.quantity
+        supplier.save()
 
 class BranchProduct(models.Model):
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name='products')

@@ -19,7 +19,7 @@ urlpatterns = [
     # auto complete
     path('product-autocomplete/', ProductAutocomplete.as_view(), name='product-autocomplete'),
     path('branch-autocomplete/', BranchAutocomplete.as_view(), name='branch-autocomplete'),
-    path('supplier-autocomplete/', SupplierAutocomplete.as_view(), name='supplier-autocomplete'),
+    # path('supplier-autocomplete/', SupplierAutocomplete.as_view(), name='supplier-autocomplete'),
     
     # excel export
     path('export_to_excel/<str:instance>', views.export_to_excel, name='export_to_excel'),
