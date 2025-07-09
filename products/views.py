@@ -234,13 +234,55 @@ def view_branch_details(request, id):
             Q(imported_by__username__icontains=txn_q)
         )
 
-    return render(request, "view_branch_details.html", {
+    # --- Pagination Implementation ---
+    products_paginator = Paginator(products, 10)
+    page = request.GET.get('page')
+    # Exclude 'page' from query params
+    query_params = request.GET.copy()
+    query_params.pop('page', None)
+    products_base_query = query_params.urlencode()
+
+
+    try:
+        products_page = products_paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        products_page = products_paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        products_page = products_paginator.page(products_paginator.num_pages)
+    # --- End Pagination Implementation ---
+
+    # --- Pagination Implementation ---
+    transactions_paginator = Paginator(transactions, 10)
+    page = request.GET.get('page')
+    # Exclude 'page' from query params
+    query_params = request.GET.copy()
+    query_params.pop('page', None)
+    transations_base_query = query_params.urlencode()
+
+
+    try:
+        transations_page = transactions_paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        transations_page = transactions_paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        transations_page = transactions_paginator.page(transactions_paginator.num_pages)
+    # --- End Pagination Implementation ---
+
+    viewModel = {
+        "products_base_query": products_base_query,
+        "transations_base_query": transations_base_query,
         "branch": branch,
         "product_q": product_q,
         "txn_q": txn_q,
-        "products": products,
-        "transactions": transactions,
-    })
+        "products": products_page,
+        "transactions": transations_page,
+    }
+
+    return render(request, "view_branch_details.html", viewModel)
 
 # @login_required
 # def view_serial_list(request):

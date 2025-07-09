@@ -55,6 +55,37 @@
     Export Branch Product to Excel
 </a>
 
+<br>
+    {% if products.paginator.num_pages > 1 %}
+  <div class="pagination">
+
+    {% if imports.has_previous %}
+      <a href="?page=1{% if products_base_query %}&{{ products_base_query }}{% endif %}">&laquo; First</a>
+      <a href="?page={{ products.previous_page_number }}{% if products_base_query %}&{{ products_base_query }}{% endif %}">Previous</a>
+    {% endif %}
+
+    {% for i in products.paginator.page_range %}
+      {% if i >= products.number|add:'-2' and i <= products.number|add:'2' %}
+        {% if i == products.number %}
+          <span class="current">{{ i }}</span>
+        {% else %}
+          <a href="?page={{ i }}{% if products_base_query %}&{{ products_base_query }}{% endif %}">{{ i }}</a>
+        {% endif %}
+      {% elif i == 1 or i == products.paginator.num_pages %}
+        <a href="?page={{ i }}{% if products_base_query %}&{{ products_base_query }}{% endif %}">{{ i }}</a>
+      {% elif i == products.number|add:'-3' or i == products.number|add:'3' %}
+        ...
+      {% endif %}
+    {% endfor %}
+
+    {% if products.has_next %}
+      <a href="?page={{ products.next_page_number }}{% if products_base_query %}&{{ products_base_query }}{% endif %}">Next</a>
+      <a href="?page={{ products.paginator.num_pages }}{% if products_base_query %}&{{ products_base_query }}{% endif %}">Last &raquo;</a>
+    {% endif %}
+
+  </div>
+{% endif %}
+
 {% else %}
 <p>No products available in {{ branch.name }}.</p>
 {% endif %}
@@ -98,6 +129,37 @@
 <a href="{% url 'export_to_excel' 'transactions' %}?{{ txn_q|urlencode }}&source__branch={{ branch.name|urlencode }}&destination__branch={{ branch.name|urlencode }}">
     Export Transactions to Excel
 </a>
+
+<br>
+    {% if transactions.paginator.num_pages > 1 %}
+  <div class="pagination">
+
+    {% if transactions.has_previous %}
+      <a href="?page=1{% if transactions_base_query %}&{{ transactions_base_query }}{% endif %}">&laquo; First</a>
+      <a href="?page={{ transactions.previous_page_number }}{% if transactions_base_query %}&{{ transactions_base_query }}{% endif %}">Previous</a>
+    {% endif %}
+
+    {% for i in transactions.paginator.page_range %}
+      {% if i >= transactions.number|add:'-2' and i <= transactions.number|add:'2' %}
+        {% if i == transactions.number %}
+          <span class="current">{{ i }}</span>
+        {% else %}
+          <a href="?page={{ i }}{% if transactions_base_query %}&{{ transactions_base_query }}{% endif %}">{{ i }}</a>
+        {% endif %}
+      {% elif i == 1 or i == transactions.paginator.num_pages %}
+        <a href="?page={{ i }}{% if transactions_base_query %}&{{ transactions_base_query }}{% endif %}">{{ i }}</a>
+      {% elif i == transactions.number|add:'-3' or i == transactions.number|add:'3' %}
+        ...
+      {% endif %}
+    {% endfor %}
+
+    {% if transactions.has_next %}
+      <a href="?page={{ transactions.next_page_number }}{% if transactions_base_query %}&{{ transactions_base_query }}{% endif %}">Next</a>
+      <a href="?page={{ transactions.paginator.num_pages }}{% if transactions_base_query %}&{{ transactions_base_query }}{% endif %}">Last &raquo;</a>
+    {% endif %}
+
+  </div>
+{% endif %}
 
 {% else %}
 <p>No transactions found for this branch.</p>
