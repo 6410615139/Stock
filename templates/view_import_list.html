@@ -37,9 +37,40 @@
     </tbody>
 </table>
 
-<a href="{% url 'export_to_excel' 'transactions' %}">
+<a href="{% url 'export_to_excel' 'imports' %}">
     Export to Excel
 </a>
+
+<br>
+    {% if imports.paginator.num_pages > 1 %}
+  <div class="pagination">
+
+    {% if imports.has_previous %}
+      <a href="?page=1{% if base_query %}&{{ base_query }}{% endif %}">&laquo; First</a>
+      <a href="?page={{ imports.previous_page_number }}{% if base_query %}&{{ base_query }}{% endif %}">Previous</a>
+    {% endif %}
+
+    {% for i in imports.paginator.page_range %}
+      {% if i >= imports.number|add:'-2' and i <= imports.number|add:'2' %}
+        {% if i == imports.number %}
+          <span class="current">{{ i }}</span>
+        {% else %}
+          <a href="?page={{ i }}{% if base_query %}&{{ base_query }}{% endif %}">{{ i }}</a>
+        {% endif %}
+      {% elif i == 1 or i == imports.paginator.num_pages %}
+        <a href="?page={{ i }}{% if base_query %}&{{ base_query }}{% endif %}">{{ i }}</a>
+      {% elif i == imports.number|add:'-3' or i == imports.number|add:'3' %}
+        ...
+      {% endif %}
+    {% endfor %}
+
+    {% if imports.has_next %}
+      <a href="?page={{ imports.next_page_number }}{% if base_query %}&{{ base_query }}{% endif %}">Next</a>
+      <a href="?page={{ imports.paginator.num_pages }}{% if base_query %}&{{ base_query }}{% endif %}">Last &raquo;</a>
+    {% endif %}
+
+  </div>
+{% endif %}
 
 {% else %}
 <p>No transactions found.</p>

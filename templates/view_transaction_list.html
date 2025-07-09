@@ -43,6 +43,38 @@
     Export to Excel
 </a>
 
+<br>
+
+{% if products.paginator.num_pages > 1 %}
+  <div class="pagination">
+
+    {% if products.has_previous %}
+      <a href="?page=1{% if base_query %}&{{ base_query }}{% endif %}">&laquo; First</a>
+      <a href="?page={{ products.previous_page_number }}{% if base_query %}&{{ base_query }}{% endif %}">Previous</a>
+    {% endif %}
+
+    {% for i in products.paginator.page_range %}
+      {% if i >= products.number|add:'-2' and i <= products.number|add:'2' %}
+        {% if i == products.number %}
+          <span class="current">{{ i }}</span>
+        {% else %}
+          <a href="?page={{ i }}{% if base_query %}&{{ base_query }}{% endif %}">{{ i }}</a>
+        {% endif %}
+      {% elif i == 1 or i == products.paginator.num_pages %}
+        <a href="?page={{ i }}{% if base_query %}&{{ base_query }}{% endif %}">{{ i }}</a>
+      {% elif i == products.number|add:'-3' or i == products.number|add:'3' %}
+        ...
+      {% endif %}
+    {% endfor %}
+
+    {% if products.has_next %}
+      <a href="?page={{ products.next_page_number }}{% if base_query %}&{{ base_query }}{% endif %}">Next</a>
+      <a href="?page={{ products.paginator.num_pages }}{% if base_query %}&{{ base_query }}{% endif %}">Last &raquo;</a>
+    {% endif %}
+
+  </div>
+{% endif %}
+
 {% else %}
 <p>No transactions found.</p>
 {% endif %}

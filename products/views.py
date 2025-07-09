@@ -15,7 +15,7 @@ from .models import (
     Product, Branch,
     BranchProduct, Transaction, Import, Supplier
 )
-from django.db.models import Sum
+from urllib.parse import urlencode
 from django.utils.timezone import now
 from dal import autocomplete
 
@@ -92,6 +92,11 @@ def view_product_list(request):
     # --- Pagination Implementation ---
     paginator = Paginator(products, 30)  # Show 30 products per page
     page = request.GET.get('page')
+    # Exclude 'page' from query params
+    query_params = request.GET.copy()
+    query_params.pop('page', None)
+    base_query = query_params.urlencode()
+
 
     try:
         products_page = paginator.page(page)
@@ -104,6 +109,7 @@ def view_product_list(request):
     # --- End Pagination Implementation ---
 
     viewModel = {
+        "base_query": base_query,
         'default': default,
         'products': products_page,  # Use the paginated queryset here
         'query': query, 
@@ -140,8 +146,7 @@ def view_product_details(request, id):
         "transactions": transactions,
     })
 
-
-@user_passes_test(admin_check)
+@login_required
 def add_product(request):
     if request.method == 'POST':
         if 'excel_file' in request.FILES:
@@ -402,6 +407,8 @@ def add_transaction(request):
 
     return render(request, 'add_transaction.html', {'form': form})
 
+@login_required
+@user_passes_test(admin_check)
 def import_product(request):
     if request.method == 'POST':
             if 'excel_file' in request.FILES:
@@ -462,9 +469,30 @@ def import_product(request):
 
 def view_import_list(request):
     imports = Import.objects.select_related("product", "imported_by")
-    return render(request, "view_import_list.html", {
-        "imports": imports,
-    })
+    # --- Pagination Implementation ---
+    paginator = Paginator(imports, 30)
+    page = request.GET.get('page')
+    # Exclude 'page' from query params
+    query_params = request.GET.copy()
+    query_params.pop('page', None)
+    base_query = query_params.urlencode()
+
+
+    try:
+        imports_page = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        imports_page = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        imports_page = paginator.page(paginator.num_pages)
+    # --- End Pagination Implementation ---
+
+    viewModel = {
+        "base_query": base_query,
+        "imports": imports_page,
+    }
+    return render(request, "view_import_list.html", viewModel)
 
 @login_required
 def export_to_excel(request, instance):
@@ -528,7 +556,29 @@ def view_transaction_list(request):
 
     transactions = transactions.order_by("-created_at")
 
-    return render(request, "view_transaction_list.html", {
-        "transactions": transactions,
+    # --- Pagination Implementation ---
+    paginator = Paginator(transactions, 30)  # Show 30 products per page
+    page = request.GET.get('page')
+    # Exclude 'page' from query params
+    query_params = request.GET.copy()
+    query_params.pop('page', None)
+    base_query = query_params.urlencode()
+
+
+    try:
+        transactions_page = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        transactions_page = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        transactions_page = paginator.page(paginator.num_pages)
+    # --- End Pagination Implementation ---
+
+    viewModel = {
+        "base_query": base_query,
+        "transactions": transactions_page,
         "query": query,
-    })
+    }
+
+    return render(request, "view_transaction_list.html", viewModel)
