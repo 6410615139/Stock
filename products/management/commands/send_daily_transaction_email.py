@@ -3,7 +3,7 @@ from django.core.mail import EmailMessage
 from django.conf import settings
 from django.utils.timezone import now
 
-from products.models import Transaction, SerialImportTransaction
+from products.models import Transaction, Import
 
 import pandas as pd
 from io import BytesIO
@@ -17,7 +17,7 @@ class Command(BaseCommand):
 
         # === Get today's data ===
         transfers = Transaction.objects.filter(created_at__date=today)
-        imports = SerialImportTransaction.objects.filter(created_at__date=today)
+        imports = Import.objects.filter(created_at__date=today)
 
         if not transfers.exists() and not imports.exists():
             self.stdout.write("No transactions or imports today.")
