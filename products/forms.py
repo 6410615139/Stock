@@ -1,8 +1,7 @@
 from django import forms
-from dal import autocomplete
+# from dal import autocomplete
 from dal_select2.widgets import ModelSelect2
-# from .models import Product, Serial, Transaction
-from .models import Product, Transaction, Import
+from .models import Product, Transaction, Import, Serial
 
 class ProductForm(forms.ModelForm):
     class Meta:
@@ -30,21 +29,21 @@ class ImportProductForm(forms.ModelForm):
 class UploadExcelForm(forms.Form):
     excel_file = forms.FileField(label="Upload Excel File")
 
-# class SerialForm(forms.ModelForm):
-#     class Meta:
-#         model = Serial
-#         fields = ['serial', 'product']
-#         widgets = {
-#             'product': ModelSelect2(url='product-autocomplete')
-#         }
+class SerialForm(forms.ModelForm):
+    class Meta:
+        model = Serial
+        fields = ['serial', 'product']
+        widgets = {
+            'product': ModelSelect2(url='product-autocomplete')
+        }
 
-# class MultipleSerialForm(forms.Form):
-#     model = forms.ModelChoiceField(
-#         queryset=Product.objects.all(),
-#         label="Product Model",
-#         widget=ModelSelect2(url='product-autocomplete')
-#     )
-#     serials = forms.CharField(
-#         label="Serials (space or enter separated)",
-#         widget=forms.Textarea(attrs={"rows": 5, "placeholder": "e.g. SN123 SN124\nSN125"}),
-#     )
+class MultipleSerialForm(forms.Form):
+    model = forms.ModelChoiceField(
+        queryset=Product.objects.all(),
+        label="Product Model",
+        widget=ModelSelect2(url='product-autocomplete')
+    )
+    serials = forms.CharField(
+        label="Serials (space or enter separated)",
+        widget=forms.Textarea(attrs={"rows": 5, "placeholder": "e.g. SN123 SN124\nSN125"}),
+    )

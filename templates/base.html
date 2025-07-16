@@ -37,6 +37,8 @@
                 <a href="{% url 'view_transaction_list' %}">ธุรกรรม</a> /
                 <a href="{% url 'view_import_list' %}">รายการนำเข้าสินค้า</a> /
                 <a href="{% url 'add_transaction' %}">โอนย้ายสินค้า</a> /
+                <a href="{% url 'view_serial_list' %}">serial</a> /
+                <a href="{% url 'add_serial' %}">+serial</a> /
                 <form id="logout-form" method="post" action="{% url 'logout' %}">
                     {% csrf_token %}
                     <button type="submit">ออกจากระบบ</button>

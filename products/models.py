@@ -49,6 +49,7 @@ class Transaction(models.Model):
     quantity = models.IntegerField()
     source = models.ForeignKey(Branch, on_delete=models.PROTECT, null=False, blank=False, related_name='source')
     destination = models.ForeignKey(Branch, on_delete=models.PROTECT, null=False, blank=False, related_name='destination')
+    invoice = models.CharField(max_length=20, null=True, blank=True)
 
     def __str__(self):
         return f"Transaction of {self.quantity} {self.model} from {self.source} to {self.destination}"
@@ -123,19 +124,19 @@ class BranchProduct(models.Model):
             "Quantity": self.quantity,
         }
     
-# class Serial(models.Model):
-#     serial = models.CharField(max_length=30, unique=True)
-#     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='serials')
+class Serial(models.Model):
+    serial = models.CharField(max_length=30, unique=True)
+    product = models.ForeignKey(Product, on_delete=models.PROTECT)
 
-#     def __str__(self):
-#         return f"{self.serial} - {self.product.model}"
+    def __str__(self):
+        return f"{self.product.model} - {self.serial}"
     
-#     def to_excel_row(self):
-#         return {
-#             "Serial": self.serial,
-#             "Product Model": self.product.model,
-#             "Product Brand": self.product.brand,
-#         }
+    def to_excel_row(self):
+        return {
+            "Serial": self.serial,
+            "Model": self.product.model,
+            "Brand": self.product.brand,
+        }
 
 # class SerialImportTransaction(models.Model):
 #     created_at = models.DateTimeField(auto_now_add=True)

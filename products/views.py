@@ -5,14 +5,12 @@ from django.http import HttpResponse, Http404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger # Import Paginator
 
 import pandas as pd
-# from .forms import ProductForm, UploadExcelForm, SerialForm, TransactionForm, MultipleSerialForm
-# from .models import (
-#     Product, Serial, SerialImportTransaction, Branch,
-#     BranchProduct, Transaction
-# )
-from .forms import ProductForm, UploadExcelForm, TransactionForm, ImportProductForm
+from .forms import (
+    ProductForm, UploadExcelForm, TransactionForm, ImportProductForm,
+    SerialForm, MultipleSerialForm
+)
 from .models import (
-    Product, Branch,
+    Product, Branch, Serial,
     BranchProduct, Transaction, Import, Supplier
 )
 from urllib.parse import urlencode
@@ -286,103 +284,103 @@ def view_branch_details(request, id):
 
     return render(request, "view_branch_details.html", viewModel)
 
-# @login_required
-# def view_serial_list(request):
+@login_required
+def view_serial_list(request):
 
-#     serials = Serial.objects.all()
+    serials = Serial.objects.all()
     
-#     query = request.GET.get('q')  # Get the search query from the request
-#     if query:
-#         serials = Serial.objects.filter(
-#             Q(serial__icontains=query)
-#         )
-#     default = request.GET.get('default')
-#     if default is None:
-#         default=""
+    query = request.GET.get('q')  # Get the search query from the request
+    if query:
+        serials = Serial.objects.filter(
+            Q(serial__icontains=query)
+        )
+    default = request.GET.get('default')
+    if default is None:
+        default=""
 
-#     viewModel = {
-#         'default': default,
-#         'serials': serials,
-#         'query': query
-#     }
+    viewModel = {
+        'default': default,
+        'serials': serials,
+        'query': query
+    }
 
-#     return render(request, 'view_serial_list.html', viewModel)
+    return render(request, 'view_serial_list.html', viewModel)
 
-# @login_required
-# def add_serial(request):
-#     if request.method == 'POST':
-#         submit_type = request.POST.get('submit_type')
+@login_required
+def add_serial(request):
+    if request.method == 'POST':
+        submit_type = request.POST.get('submit_type')
 
-#         # ✅ Excel Upload
-#         if submit_type == 'excel' and 'excel_file' in request.FILES:
-#             excel_form = UploadExcelForm(request.POST, request.FILES)
-#             if excel_form.is_valid():
-#                 excel_file = request.FILES['excel_file']
-#                 df = pd.read_excel(excel_file)
+        # ✅ Excel Upload
+        if submit_type == 'excel' and 'excel_file' in request.FILES:
+            excel_form = UploadExcelForm(request.POST, request.FILES)
+            if excel_form.is_valid():
+                excel_file = request.FILES['excel_file']
+                df = pd.read_excel(excel_file)
 
-#                 model_counter = {}
+                model_counter = {}
 
-#                 for _, row in df.iterrows():
-#                     serial_number = str(row.get('Serial')).strip()
-#                     model_name = row.get('Product Model')
+                for _, row in df.iterrows():
+                    serial_number = str(row.get('Serial')).strip()
+                    model_name = row.get('Product Model')
 
-#                     if not serial_number or not model_name:
-#                         continue
+                    if not serial_number or not model_name:
+                        continue
 
-#                     try:
-#                         product = Product.objects.get(model=model_name)
-#                         if Serial.objects.filter(serial=serial_number).exists():
-#                             continue  # Skip duplicate
-#                         Serial.objects.create(serial=serial_number, product=product)
-#                         model_counter[model_name] = model_counter.get(model_name, 0) + 1
-#                     except Product.DoesNotExist:
-#                         continue
+                    try:
+                        product = Product.objects.get(model=model_name)
+                        if Serial.objects.filter(serial=serial_number).exists():
+                            continue  # Skip duplicate
+                        Serial.objects.create(serial=serial_number, product=product)
+                        model_counter[model_name] = model_counter.get(model_name, 0) + 1
+                    except Product.DoesNotExist:
+                        continue
 
-#                 _process_import_transaction(model_counter, request.user)
-#                 return redirect('view_serial_list')
+                _process_import_transaction(model_counter, request.user)
+                return redirect('view_serial_list')
 
-#         # ✅ Multiple serials via textarea
-#         elif submit_type == 'multiple':
-#             multiple_serial_form = MultipleSerialForm(request.POST)
-#             if multiple_serial_form.is_valid():
-#                 serials_input = multiple_serial_form.cleaned_data['serials']
-#                 model_name = multiple_serial_form.cleaned_data['model']
-#                 model_counter = {}
+        # ✅ Multiple serials via textarea
+        elif submit_type == 'multiple':
+            multiple_serial_form = MultipleSerialForm(request.POST)
+            if multiple_serial_form.is_valid():
+                serials_input = multiple_serial_form.cleaned_data['serials']
+                model_name = multiple_serial_form.cleaned_data['model']
+                model_counter = {}
 
-#                 try:
-#                     product = Product.objects.get(model=model_name)
-#                     serials = serials_input.replace('\r', '').split('\n')
-#                     count = 0
-#                     for s in serials:
-#                         for serial in s.split():
-#                             Serial.objects.create(serial=serial.strip(), product=product)
-#                             count += 1
-#                     model_counter[model_name] = count
-#                 except Product.DoesNotExist:
-#                     print(f"❌ Product model '{model_name}' not found")
+                try:
+                    product = Product.objects.get(model=model_name)
+                    serials = serials_input.replace('\r', '').split('\n')
+                    count = 0
+                    for s in serials:
+                        for serial in s.split():
+                            Serial.objects.create(serial=serial.strip(), product=product)
+                            count += 1
+                    model_counter[model_name] = count
+                except Product.DoesNotExist:
+                    print(f"❌ Product model '{model_name}' not found")
 
-#                 _process_import_transaction(model_counter, request.user)
-#                 return redirect('view_serial_list')
+                # _process_import_transaction(model_counter, request.user)
+                return redirect('view_serial_list')
 
-#         # ✅ Single serial input
-#         elif submit_type == 'single':
-#             form = SerialForm(request.POST)
-#             if form.is_valid():
-#                 serial = form.save()
-#                 model_name = serial.product.model
-#                 _process_import_transaction({model_name: 1}, request.user)
-#                 return redirect('view_serial_list')
+        # ✅ Single serial input
+        elif submit_type == 'single':
+            form = SerialForm(request.POST)
+            if form.is_valid():
+                serial = form.save()
+                model_name = serial.product.model
+                # _process_import_transaction({model_name: 1}, request.user)
+                return redirect('view_serial_list')
 
-#     else:
-#         form = SerialForm()
-#         excel_form = UploadExcelForm()
-#         multiple_serial_form = MultipleSerialForm()
+    else:
+        form = SerialForm()
+        excel_form = UploadExcelForm()
+        multiple_serial_form = MultipleSerialForm()
 
-#     return render(request, 'add_serial.html', {
-#         'single_serial_form': form,
-#         'excel_form': excel_form,
-#         'multiple_serial_form': multiple_serial_form,
-#     })
+    return render(request, 'add_serial.html', {
+        'single_serial_form': form,
+        'excel_form': excel_form,
+        'multiple_serial_form': multiple_serial_form,
+    })
 
 # # ✅ Helper function to create transaction records and update stock
 # def _process_import_transaction(model_counter, user):

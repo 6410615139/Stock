@@ -13,8 +13,8 @@ urlpatterns = [
     path('import_product/', views.import_product, name='import_product'),
     path('view_branch_list/', views.view_branch_list, name='view_branch_list'),
     path('view_branch_details/<int:id>', views.view_branch_details, name='view_branch_details'),
-    # path('add_serial/', views.add_serial, name='add_serial'),
-    # path('view_serial_list/', views.view_serial_list, name='view_serial_list'),
+    path('add_serial/', views.add_serial, name='add_serial'),
+    path('view_serial_list/', views.view_serial_list, name='view_serial_list'),
     
     # auto complete
     path('product-autocomplete/', ProductAutocomplete.as_view(), name='product-autocomplete'),
