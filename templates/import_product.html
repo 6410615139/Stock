@@ -25,6 +25,10 @@
 
 <!-- Excel Upload Form -->
 <h2>Upload Excel File</h2>
+<p>
+    ใน file จะต้องประกอบไปด้วย column <br>
+    'Brand', 'Model', 'Description', 'EAN Code', 'Dealer Price', 'Volume Price', 'MSRP', 'Total'
+</p>
 <form method="post" enctype="multipart/form-data" class="aligned">
     {% csrf_token %}
     {{ excel_form.as_p }}

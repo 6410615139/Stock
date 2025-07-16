@@ -34,6 +34,10 @@
 
 <!-- Excel Upload Form -->
 <h2>3. Upload Serials via Excel File</h2>
+<p>
+    ใน file จะต้องประกอบไปด้วย column <br>
+    'Serial', 'Model'
+</p>
 <form method="post" enctype="multipart/form-data" class="aligned">
     {% csrf_token %}
     {{ excel_form.as_p }}

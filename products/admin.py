@@ -1,6 +1,6 @@
 from django.contrib import admin
 # from .models import Product, Serial, Branch, SerialImportTransaction, Transaction, BranchProduct
-from .models import Product, Branch, Transaction, BranchProduct, Import
+from .models import Product, Branch, Transaction, BranchProduct, Import, Serial
 
 
 @admin.register(Product)
@@ -37,11 +37,11 @@ class BranchProductAdmin(admin.ModelAdmin):
         return obj.product.model
     product_model.short_description = 'Product Model'
 
-# @admin.register(Serial)
-# class SerialAdmin(admin.ModelAdmin):
-#     list_display = ('serial', 'product')
-#     search_fields = ('serial',)
-#     list_filter = ('product',)
+@admin.register(Serial)
+class SerialAdmin(admin.ModelAdmin):
+    list_display = ('serial', 'product')
+    search_fields = ('serial',)
+    list_filter = ('product',)
 
 # @admin.register(SerialImportTransaction)
 # class SerialImportTransactionAdmin(admin.ModelAdmin):

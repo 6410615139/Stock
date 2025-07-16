@@ -21,15 +21,17 @@
     <thead>
         <tr>
             <th>Serial</th>
+            <th>Model</th>
             <th>Details</th>
         </tr>
     </thead>
     <tbody>
-        {% for product in serials %}
+        {% for serial in serials %}
         <tr>
-            <td>{{ product.serial }}</td>
+            <td>{{ serial.serial }}</td>
+            <td>{{ serial.product.model }}</td>
             <td>
-                <a class="button" href="{% url 'view_product_details' product.product.id %} ">
+                <a class="button" href="{% url 'view_product_details' serial.product.id %} ">
                     รายละเอียด
                 </a>
             </td>

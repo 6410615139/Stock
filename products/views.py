@@ -164,7 +164,7 @@ def add_product(request):
                             description=row.get('Description', ''),
                             EAN_code=row.get('EAN Code', ''),
                             dealer_price=float(row.get('Dealer Price', 0)),
-                            volume_price=float(row.get('volume Price', 0)),
+                            volume_price=float(row.get('Volume Price', 0)),
                             MSRP=float(row.get('MSRP', 0)),
                         )
                     except Exception as e:
@@ -289,7 +289,7 @@ def view_serial_list(request):
 
     serials = Serial.objects.all()
     
-    query = request.GET.get('q')  # Get the search query from the request
+    query = request.GET.get('q')
     if query:
         serials = Serial.objects.filter(
             Q(serial__icontains=query)
@@ -322,7 +322,7 @@ def add_serial(request):
 
                 for _, row in df.iterrows():
                     serial_number = str(row.get('Serial')).strip()
-                    model_name = row.get('Product Model')
+                    model_name = row.get('Model')
 
                     if not serial_number or not model_name:
                         continue
@@ -330,13 +330,13 @@ def add_serial(request):
                     try:
                         product = Product.objects.get(model=model_name)
                         if Serial.objects.filter(serial=serial_number).exists():
-                            continue  # Skip duplicate
+                            continue
                         Serial.objects.create(serial=serial_number, product=product)
                         model_counter[model_name] = model_counter.get(model_name, 0) + 1
                     except Product.DoesNotExist:
                         continue
 
-                _process_import_transaction(model_counter, request.user)
+                # _process_import_transaction(model_counter, request.user)
                 return redirect('view_serial_list')
 
         # ✅ Multiple serials via textarea
@@ -416,7 +416,7 @@ def add_transaction(request):
         if form.is_valid():
             transaction = form.save(commit=False)
 
-            product = transaction.product  # this is a Product instance if you changed to ForeignKey
+            product = transaction.product
             quantity = transaction.quantity
             source_branch = transaction.source
             destination_branch = transaction.destination
@@ -469,7 +469,7 @@ def import_product(request):
                                 description=row.get('Description', ''),
                                 EAN_code=row.get('EAN Code', ''),
                                 dealer_price=float(row.get('Dealer Price', 0)),
-                                volume_price=float(row.get('volume Price', 0)),
+                                volume_price=float(row.get('Volume Price', 0)),
                                 MSRP=float(row.get('MSRP', 0)),
                             )
                             supplier = Supplier.objects.get(name="อื่นๆ")
@@ -563,9 +563,11 @@ def export_to_excel(request, instance):
     model_map = {
         "products": Product,
         "branches": Branch,
-        # "serials": Serial,
+        "serials": Serial,
         "branchproducts": BranchProduct,
         "transactions": Transaction,
+        "imports": Import,
+        # "suppliers": Supplier
     }
 
     model = model_map.get(instance)

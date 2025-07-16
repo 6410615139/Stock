@@ -35,8 +35,8 @@
         <tr>
             <th>Brand</th>
             <th>Model</th>
-            <th>Description</th>
-            <th>Quantity</th>
+            <th>คำอธิบาย</th>
+            <th>จำนวนในสาขา{{ branch.name }}</th>
         </tr>
     </thead>
     <tbody>
@@ -104,12 +104,12 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Created At</th>
-            <th>Imported By</th>
+            <th>เวลา</th>
+            <th>ผู้จัดทำ</th>
             <th>Model</th>
-            <th>Quantity</th>
-            <th>Source</th>
-            <th>Destination</th>
+            <th>จำนวน</th>
+            <th>ต้นทาง</th>
+            <th>ปลายทาง</th>
         </tr>
     </thead>
     <tbody>
@@ -119,8 +119,8 @@
             <td>{{ t.imported_by.username|default:"—" }}</td>
             <td>{{ t.product.model }}</td>
             <td>{{ t.quantity }}</td>
-            <td>{{ t.source.branch }}</td>
-            <td>{{ t.destination.branch }}</td>
+            <td>{{ t.source }}</td>
+            <td>{{ t.destination }}</td>
         </tr>
         {% endfor %}
     </tbody>

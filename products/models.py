@@ -52,7 +52,7 @@ class Transaction(models.Model):
     invoice = models.CharField(max_length=20, null=True, blank=True)
 
     def __str__(self):
-        return f"Transaction of {self.quantity} {self.model} from {self.source} to {self.destination}"
+        return f"Transaction of {self.quantity} {self.product.model} from {self.source} to {self.destination}"
 
     def to_excel_row(self):
         return {
