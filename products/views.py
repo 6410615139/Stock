@@ -511,6 +511,27 @@ def import_product(request):
 
 def view_import_list(request):
     imports = Import.objects.select_related("product", "imported_by")
+
+    # default query
+    default = request.GET.get('default', "")
+    if default != "":
+        imports = imports.filter(
+            Q(created_at__icontains=default) | 
+            Q(imported_by__username__icontains=default) | 
+            Q(product__model__icontains=default) |
+            Q(quantity__icontains=default)
+        )
+
+    # searchbar query
+    query = request.GET.get('q')  # Get the search query from the request
+    if query:
+        imports = imports.filter(
+            Q(created_at__icontains=query) | 
+            Q(imported_by__username__icontains=query) | 
+            Q(product__model__icontains=query) |
+            Q(quantity__icontains=query)
+        )
+
     # --- Pagination Implementation ---
     paginator = Paginator(imports, 30)
     page = request.GET.get('page')
@@ -531,6 +552,7 @@ def view_import_list(request):
     # --- End Pagination Implementation ---
 
     viewModel = {
+        'default': default,
         "base_query": base_query,
         "imports": imports_page,
     }
