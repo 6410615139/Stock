@@ -221,8 +221,10 @@ def view_branch_details(request, id):
     products = BranchProduct.objects.select_related("product").filter(branch=branch)
     if product_q:
         products = products.filter(
-            Q(model__model__icontains=product_q) |
-            Q(model__brand__icontains=product_q)
+            Q(product__brand__icontains=product_q) |
+            Q(product__model__icontains=product_q) |
+            Q(product__description__icontains=product_q) |
+            Q(quantity__icontains=product_q)
         )
 
     transactions = Transaction.objects.select_related("product", "imported_by", "source", "destination").filter(
@@ -230,7 +232,7 @@ def view_branch_details(request, id):
     )
     if txn_q:
         transactions = transactions.filter(
-            Q(model__model__icontains=txn_q) |
+            Q(product__model__icontains=txn_q) |
             Q(imported_by__username__icontains=txn_q)
         )
 

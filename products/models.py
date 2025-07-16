@@ -44,7 +44,7 @@ class Branch(models.Model):
 
 class Transaction(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    imported_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    imported_by = models.ForeignKey(User, on_delete=models.PROTECT, null=True)
     product = models.ForeignKey(Product, on_delete=models.PROTECT)
     quantity = models.IntegerField()
     source = models.ForeignKey(Branch, on_delete=models.PROTECT, null=False, blank=False, related_name='source')
@@ -109,9 +109,9 @@ class Import(models.Model):
         supplier.save()
 
 class BranchProduct(models.Model):
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE, related_name='products')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=0)
+    branch = models.ForeignKey(Branch, on_delete=models.PROTECT, related_name='products')
+    product = models.ForeignKey(Product, on_delete=models.PROTECT)
+    quantity = models.IntegerField(null=False, blank=False, default=0)
 
     def __str__(self):
         return f"{self.branch.name} - {self.product.model} ({self.quantity})"
